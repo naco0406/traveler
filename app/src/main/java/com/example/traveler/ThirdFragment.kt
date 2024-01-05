@@ -15,13 +15,17 @@ import com.navercorp.nid.oauth.OAuthLoginCallback
 import com.navercorp.nid.oauth.view.NidOAuthLoginButton
 import com.navercorp.nid.profile.NidProfileCallback
 import com.navercorp.nid.profile.data.NidProfileResponse
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody
+import okhttp3.Response
 
 class ThirdFragment : Fragment() {
     private val TAG = this.javaClass.simpleName
     private var name: String = ""
-    private var email: String = ""
-    private var birthDay: String = ""
-    private var birthYear: String = ""
     private var phoneNum: String = ""
 
     override fun onCreateView(
@@ -40,18 +44,15 @@ class ThirdFragment : Fragment() {
                     NidOAuthLogin().callProfileApi(object : NidProfileCallback<NidProfileResponse> {
                         override fun onSuccess(result: NidProfileResponse) {
                             val name = result.profile?.name.toString()
-                            val email = result.profile?.email.toString()
-                            val gender = result.profile?.gender.toString()
-                            val birthDay  = result.profile?.birthday.toString()
                             val phoneNum = result.profile?.mobile.toString()
-                            val birthYear = result.profile?.birthYear.toString()
 
                             Log.e(TAG, "네이버 로그인한 유저 정보 - 이름 : $name")
-                            Log.e(TAG, "네이버 로그인한 유저 정보 - 이메일 : $email")
-                            Log.e(TAG, "네이버 로그인한 유저 정보 - 성별 : $gender")
-                            Log.e(TAG, "네이버 로그인한 유저 정보 - 생일 : $birthDay")
                             Log.e(TAG, "네이버 로그인한 유저 정보 - 전화번호 : $phoneNum")
-                            Log.e(TAG, "네이버 로그인한 유저 정보 - 태어난 연도 : $birthYear")
+
+                            //server에 해당 회원 정보가 있는지 확인하도록 요청
+                            searchMember(name, phoneNum) { result ->
+                                Log.e(TAG,"로그인에 성공하였습니다.")
+                            }
                         }
 
                         override fun onError(errorCode: Int, message: String) {
@@ -87,6 +88,30 @@ class ThirdFragment : Fragment() {
         }
 
         return rootView
+    }
+
+    private fun searchMember(name: String, phoneNum: String, callback: (String) -> Unit) {
+        val client = OkHttpClient()
+        val requestBody = RequestBody.create(
+            "application/json; charset=utf-8".toMediaTypeOrNull(),
+            "{\"name\":\"$name\", \"phoneNum\":\"$phoneNum\"}")
+
+        val request = Request.Builder()
+            .url("http://43.200.170.97:5000/search")
+            .post(requestBody)
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onResponse(call: Call, response: Response) {
+                val responseDataStream = response.body?.byteStream()
+                val UserData = responseDataStream?.bufferedReader()?.use {it.readText()}
+                activity?.runOnUiThread {
+                    // XML 뷰에 결과 표시
+                    callback(UserData ?: "No response")
+                }
+            }
+        })
+
     }
 
 }
