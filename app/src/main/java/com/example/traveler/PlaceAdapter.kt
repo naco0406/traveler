@@ -17,7 +17,7 @@ class PlaceAdapter(private val context: Context) : RecyclerView.Adapter<PlaceAda
 
     var datas = mutableListOf<PlaceData>()
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(context).inflate(R.layout.main_country,parent,false)
+        val view = LayoutInflater.from(context).inflate(R.layout.main_place,parent,false)
         return ViewHolder(view)
     }
 

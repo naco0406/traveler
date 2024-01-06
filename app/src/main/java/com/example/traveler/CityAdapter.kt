@@ -17,7 +17,7 @@ class CityAdapter(private val context: Context) : RecyclerView.Adapter<CityAdapt
 
     var datas = mutableListOf<CityData>()
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(context).inflate(R.layout.main_country,parent,false)
+        val view = LayoutInflater.from(context).inflate(R.layout.main_city,parent,false)
         return ViewHolder(view)
     }
 
@@ -34,7 +34,9 @@ class CityAdapter(private val context: Context) : RecyclerView.Adapter<CityAdapt
 
         fun bind(item: CityData) {
             txtName.text = item.name
-            Glide.with(itemView).load(item.img).into(imgProfile)
+            Glide.with(itemView)
+                .load(item.img)
+                .into(imgProfile)
 
         }
     }
