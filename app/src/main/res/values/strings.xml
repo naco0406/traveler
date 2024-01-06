@@ -4,4 +4,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="naver_client_id">kqlOkK3JaKGv29hlSGFK</string>
     <string name="naver_client_secret">PdekRrDzXY</string>
+    <string name="kakao_native_app_key">kakao38a8100d38b0243704015d078da0dc9d</string>
+<!--    <string name="google_login_client_id">989926805865-4ncqdkd99u50h7bb57samo88p3qgj2vq.apps.googleusercontent.com</string>-->
+    <string name="google_login_client_id">989926805865-md399gp24erioge2oihuj9eijmovgl3s.apps.googleusercontent.com</string>
 </resources>
