@@ -15,6 +15,7 @@ class ViewPager2Adapter(fragmentActivity: FragmentActivity) : FragmentStateAdapt
             0 -> FirstFragment()
             1 -> SecondFragment()
             2 -> ThirdFragment()
+            3 -> MapFragment()
             else -> throw IndexOutOfBoundsException("Invalid fragment position")
         }
     }

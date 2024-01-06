@@ -68,16 +68,19 @@ dependencies {
     implementation("com.google.guava:guava:32.1.2-jre")
     testImplementation("junit:junit:4.13.2")
 
-    implementation("com.kakao.sdk:v2-all:2.19.0") // 전체 모듈 설치, 2.11.0 버전부터 지원
-    implementation("com.kakao.sdk:v2-user:2.19.0") // 카카오 로그인
-    implementation("com.kakao.sdk:v2-talk:2.19.0") // 친구, 메시지(카카오톡)
-    implementation("com.kakao.sdk:v2-share:2.19.0") // 메시지(카카오톡 공유)
-    implementation("com.kakao.sdk:v2-friend:2.19.0") // 카카오톡 소셜 피커, 리소스 번들 파일 포함
+//    implementation("com.kakao.sdk:v2-all:2.19.0") // 전체 모듈 설치, 2.11.0 버전부터 지원
+//    implementation("com.kakao.sdk:v2-user:2.19.0") // 카카오 로그인
+//    implementation("com.kakao.sdk:v2-talk:2.19.0") // 친구, 메시지(카카오톡)
+//    implementation("com.kakao.sdk:v2-share:2.19.0") // 메시지(카카오톡 공유)
+//    implementation("com.kakao.sdk:v2-friend:2.19.0") // 카카오톡 소셜 피커, 리소스 번들 파일 포함
 
     implementation("com.google.gms:google-services:4.3.15")
     implementation("com.google.firebase:firebase-auth:22.0.0")
     implementation("com.google.firebase:firebase-bom:32.0.0")
     implementation("com.google.android.gms:play-services-auth:20.5.0")
+
+    implementation("com.naver.maps:map-sdk:3.16.2")
+    implementation("com.google.android.gms:play-services-location:20.0.0")
 
     implementation("com.github.bumptech.glide:glide:4.12.0")
     annotationProcessor("com.github.bumptech.glide:compiler:4.12.0")
