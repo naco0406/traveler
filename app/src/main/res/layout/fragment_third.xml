@@ -31,18 +31,27 @@
         android:text="Or"
         android:gravity="center"/>
 
+
     <com.navercorp.nid.oauth.view.NidOAuthLoginButton
         android:id="@+id/naverLoginButton"
         android:layout_width="wrap_content"
         android:layout_height="50dp" />
 
-    <ImageButton
-        android:layout_width="wrap_content"
+<!--    <ImageButton-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:src="@drawable/android_light_rd_ctn_1x"-->
+<!--        android:background="@null"-->
+<!--        android:layout_marginTop="10dp"-->
+<!--        android:layout_gravity="center"-->
+<!--        android:id="@+id/clGoogleLogin"/>-->
+
+    <TextView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:src="@drawable/android_light_rd_ctn_1x"
-        android:background="@null"
-        android:layout_marginTop="10dp"
-        android:layout_gravity="center"
-        android:id="@+id/clGoogleLogin"/>
+        android:gravity="center"
+        android:text=""
+        android:textSize="20dp"
+        android:id="@+id/testText"/>
 
 </LinearLayout>
