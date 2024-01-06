@@ -85,8 +85,13 @@ class ThirdFragment : Fragment() {
 
                             //server에 해당 회원 정보가 있는지 확인하도록 요청
                             searchMember(name, phoneNum) { result ->
-                                Log.e(TAG,"로그인에 성공하였습니다.")
+                                if (result=="success") {
+                                    Log.e(TAG,"로그인에 성공하였습니다.")}
+                                else {
+                                    Log.e(TAG,"회원 정보가 없습니다.")}
                             }
+
+
                         }
 
                         override fun onError(errorCode: Int, message: String) {
@@ -131,22 +136,26 @@ class ThirdFragment : Fragment() {
             "{\"name\":\"$name\", \"phoneNum\":\"$phoneNum\"}")
 
         val request = Request.Builder()
-            .url("http://43.200.170.97:5000/search")
+            .url("http://43.200.170.97:5000/searchUser")
             .post(requestBody)
             .build()
 
         client.newCall(request).enqueue(object : Callback {
             override fun onResponse(call: Call, response: Response) {
-                val responseDataStream = response.body?.byteStream()
-                val UserData = responseDataStream?.bufferedReader()?.use {it.readText()}
+                //val statusResult = response.body?.byteStream()
+                val responseData = response.body?.string()
+                // UI 스레드에서 UI 업데이트
                 activity?.runOnUiThread {
                     // XML 뷰에 결과 표시
-                    callback(UserData ?: "No response")
+                    callback(responseData ?: "No response")
                 }
             }
 
             override fun onFailure(call: Call, e: IOException) {
-                TODO("Not yet implemented")
+                // 오류 처리
+                activity?.runOnUiThread {
+                    callback("Failed to connect: $e")
+                }
             }
         })
 
