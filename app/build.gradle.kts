@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    kotlin("plugin.serialization") version "1.5.21"
 }
 
 android {
@@ -62,6 +63,7 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2") // for serialization
 
     implementation("com.google.guava:guava:32.1.2-jre")
     testImplementation("junit:junit:4.13.2")

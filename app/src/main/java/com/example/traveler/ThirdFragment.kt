@@ -1,7 +1,9 @@
 package com.example.traveler
 
+import android.app.AlertDialog
 import android.media.Image
 import android.os.Bundle
+import android.service.autofill.UserData
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -9,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageButton
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.activityViewModels
@@ -32,6 +35,9 @@ import okhttp3.Request
 import okhttp3.RequestBody
 import okhttp3.Response
 import java.io.IOException
+import com.example.traveler.Person
+import org.json.JSONObject
+import java.io.File
 
 class ThirdFragment : Fragment() {
     private val TAG = this.javaClass.simpleName
@@ -85,10 +91,40 @@ class ThirdFragment : Fragment() {
 
                             //server에 해당 회원 정보가 있는지 확인하도록 요청
                             searchMember(name, phoneNum) { result ->
-                                if (result=="success") {
-                                    Log.e(TAG,"로그인에 성공하였습니다.")}
+
+                                Log.e(TAG, "결과 데이터 : $result")
+
+                                val status = JSONObject(result).getString("status")
+                                Log.e(TAG, status)
+
+                                if (status == "success") {
+                                    //json file을 내부 저장소에 저장
+                                    val fileName = "Mypage.json"
+                                    val internalStorageDir = context?.getFilesDir()
+                                    val file = File(internalStorageDir, fileName)
+                                    file.writeText(result)
+
+                                    val fileContents = file.readText()
+                                    val myData = JSONObject(fileContents).getJSONObject("UserData")
+                                    val userName = myData.getString("name")
+                                    val phone = myData.getString("phone")
+                                    val nickname = myData.getString("nickname")
+                                    Log.e(TAG, "네이버 로그인한 유저 정보 - 전화번호 : $phone")
+
+                                }
                                 else {
-                                    Log.e(TAG,"회원 정보가 없습니다.")}
+                                    val builder = AlertDialog.Builder(context)
+                                    builder.setTitle("로그인 실패")
+                                    builder.setMessage("일치하는 회원 정보가 없습니다.")
+                                    builder.setPositiveButton("확인") { dialog, which ->
+                                        dialog.dismiss()
+                                    }
+
+                                    val alertDialog: AlertDialog = builder.create()
+                                    alertDialog.show()
+                                    Log.e(TAG, "로그인에 실패하였습니다.")
+                                }
+
                             }
 
 
@@ -142,12 +178,13 @@ class ThirdFragment : Fragment() {
 
         client.newCall(request).enqueue(object : Callback {
             override fun onResponse(call: Call, response: Response) {
-                //val statusResult = response.body?.byteStream()
                 val responseData = response.body?.string()
                 // UI 스레드에서 UI 업데이트
                 activity?.runOnUiThread {
                     // XML 뷰에 결과 표시
-                    callback(responseData ?: "No response")
+                    if (responseData != null) {
+                        callback(responseData)
+                    }
                 }
             }
 
