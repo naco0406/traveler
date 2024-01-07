@@ -10,11 +10,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.activityViewModels
+import androidx.viewpager2.widget.ViewPager2
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -75,6 +77,69 @@ class ThirdFragment : Fragment() {
         val rootView = inflater.inflate(R.layout.fragment_third, container, false)
         val naverLoginButton = rootView.findViewById<NidOAuthLoginButton>(R.id.naverLoginButton)
 //        addListener(rootView)
+        val signupButton = rootView.findViewById<Button>(R.id.signupButton)
+        val loginButton = rootView.findViewById<Button>(R.id.loginButton)
+        val loginPhone = rootView.findViewById<EditText>(R.id.login_phoneNum)
+        val loginPassword = rootView.findViewById<EditText>(R.id.login_password)
+
+        loginButton.setOnClickListener {
+            val phone = loginPhone.text.toString()
+            val password = loginPassword.text.toString()
+            Log.e(TAG, "entered phoneNum: $phone, entered password: $password")
+            //server에 해당 회원 정보가 있는지 확인하도록 요청
+            searchMember(phone, password) { result ->
+
+                Log.e(TAG, "결과 데이터 : $result")
+
+                val status = JSONObject(result).getString("status")
+                Log.e(TAG, status)
+
+                if (status == "success") {
+                    Log.e(TAG, "로그인 성공")
+                    //json file을 내부 저장소에 저장
+                    val fileName = "Mypage.json"
+                    val internalStorageDir = context?.getFilesDir()
+                    val file = File(internalStorageDir, fileName)
+                    file.writeText(result)
+
+                    val fileContents = file.readText()
+                    val myData = JSONObject(fileContents).getJSONObject("UserData")
+                    val password = myData.getString("password")
+                    val phone = myData.getString("phone")
+                    //val nickname = myData.getString("nickname")
+                    Log.e(TAG, "로그인한 유저 정보 - 전화번호 : $phone")
+
+                }
+                else if (status == "wrong_password") {
+                    val builder = AlertDialog.Builder(context)
+                    builder.setTitle("로그인 실패")
+                    builder.setMessage("비밀번호가 일치하지 않습니다.")
+                    builder.setPositiveButton("확인") { dialog, which ->
+                        dialog.dismiss()
+                    }
+
+                    val alertDialog: AlertDialog = builder.create()
+                    alertDialog.show()
+                }
+                else {
+                    val builder = AlertDialog.Builder(context)
+                    builder.setTitle("로그인 실패")
+                    builder.setMessage("일치하는 회원 정보가 없습니다.")
+                    builder.setPositiveButton("확인") { dialog, which ->
+                        dialog.dismiss()
+                    }
+
+                    val alertDialog: AlertDialog = builder.create()
+                    alertDialog.show()
+                }
+
+            }
+
+
+
+
+        }
+
 
         naverLoginButton.setOnClickListener {
             // 네이버 로그인 버튼이 클릭되었을 때의 동작
@@ -90,7 +155,7 @@ class ThirdFragment : Fragment() {
                             Log.e(TAG, "네이버 로그인한 유저 정보 - 전화번호 : $phoneNum")
 
                             //server에 해당 회원 정보가 있는지 확인하도록 요청
-                            searchMember(name, phoneNum) { result ->
+                            searchNaverMember(name, phoneNum) { result ->
 
                                 Log.e(TAG, "결과 데이터 : $result")
 
@@ -162,14 +227,57 @@ class ThirdFragment : Fragment() {
             NaverIdLoginSDK.authenticate(requireContext(), oAuthLoginCallback)
         }
 
+        signupButton.setOnClickListener {
+            // ...
+            val dialogFragment = SignUpFragment()
+            dialogFragment.show(childFragmentManager, "SignUpFragment")
+        }
+
+
+
+
+
         return rootView
     }
 
-    private fun searchMember(name: String, phoneNum: String, callback: (String) -> Unit) {
+    private fun searchNaverMember(name: String, phoneNum: String, callback: (String) -> Unit) {
         val client = OkHttpClient()
         val requestBody = RequestBody.create(
             "application/json; charset=utf-8".toMediaTypeOrNull(),
             "{\"name\":\"$name\", \"phoneNum\":\"$phoneNum\"}")
+
+        val request = Request.Builder()
+            .url("http://43.200.170.97:5000/searchNaverUser")
+            .post(requestBody)
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onResponse(call: Call, response: Response) {
+                val responseData = response.body?.string()
+                // UI 스레드에서 UI 업데이트
+                activity?.runOnUiThread {
+                    // XML 뷰에 결과 표시
+                    if (responseData != null) {
+                        callback(responseData)
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call, e: IOException) {
+                // 오류 처리
+                activity?.runOnUiThread {
+                    callback("Failed to connect: $e")
+                }
+            }
+        })
+
+    }
+
+    private fun searchMember(phoneNum: String, password: String, callback: (String) -> Unit) {
+        val client = OkHttpClient()
+        val requestBody = RequestBody.create(
+            "application/json; charset=utf-8".toMediaTypeOrNull(),
+            "{\"password\":\"$password\", \"phoneNum\":\"$phoneNum\"}")
 
         val request = Request.Builder()
             .url("http://43.200.170.97:5000/searchUser")
@@ -197,6 +305,16 @@ class ThirdFragment : Fragment() {
         })
 
     }
+
+    fun switchToMypage(rootview:View) {
+        val myPageFragment = MyPageFragment()
+
+        val mainActivity = activity as? MainActivity
+        val adapter = mainActivity?.getViewPagerAdapter()
+        adapter?.addFragment
+    }
+
+
 
 //    private fun addListener(view: View) {
 //        val clGoogleLogin = view.findViewById<ImageButton>(R.id.clGoogleLogin)
