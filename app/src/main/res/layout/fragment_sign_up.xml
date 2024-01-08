@@ -39,9 +39,14 @@
         android:layout_height="wrap_content"
         android:text="Cancel"/>
 
-    <Button
+<!--    <Button-->
+<!--        android:id="@+id/naverSignup"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="Sign up with Naver"/>-->
+
+    <com.navercorp.nid.oauth.view.NidOAuthLoginButton
         android:id="@+id/naverSignup"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Sign up with Naver"/>
+        android:layout_width="wrap_content"
+        android:layout_height="50dp" />
 </LinearLayout>

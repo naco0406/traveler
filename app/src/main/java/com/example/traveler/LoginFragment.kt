@@ -101,7 +101,9 @@ class LoginFragment : Fragment() {
                     val fileName = "Mypage.json"
                     val internalStorageDir = requireActivity().applicationContext.getFilesDir()
                     val file = File(internalStorageDir, fileName)
-                    file.writeText(result)
+                    val saved_data = JSONObject(result).getJSONObject("UserData").toString()
+                    Log.e(TAG, "저장된 정보: $saved_data")
+                    file.writeText(JSONObject(result).getJSONObject("UserData").toString())
 
                     parentFragmentManager.beginTransaction().apply{
                         replace(R.id.fragment3_container, MyPageFragment())
@@ -168,7 +170,7 @@ class LoginFragment : Fragment() {
                                     val fileName = "Mypage.json"
                                     val internalStorageDir = requireActivity().applicationContext.getFilesDir()
                                     val file = File(internalStorageDir, fileName)
-                                    file.writeText(result)
+                                    file.writeText(JSONObject(result).getJSONObject("UserData").toString())
 
                                     parentFragmentManager.beginTransaction().apply{
                                         replace(R.id.fragment3_container, MyPageFragment())
@@ -230,8 +232,15 @@ class LoginFragment : Fragment() {
 
         signupButton.setOnClickListener {
             // ...
-            val dialogFragment = SignUpFragment()
-            dialogFragment.show(childFragmentManager, "SignUpFragment")
+//            val dialogFragment = SignUpFragment()
+//            dialogFragment.show(childFragmentManager, "SignUpFragment")
+
+            parentFragmentManager.beginTransaction().apply{
+                replace(R.id.fragment3_container, SignUpFragment())
+                setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                addToBackStack(null)
+                commit()
+            }
         }
 
 
