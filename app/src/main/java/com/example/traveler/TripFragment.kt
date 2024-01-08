@@ -72,8 +72,8 @@ class TripFragment : Fragment(), OnMapReadyCallback {
             locationTrackingMode = LocationTrackingMode.Follow
         }
 
-        val initialPlaces = listOf<Place>() // 이곳에 초기 위치 데이터를 넣으세요
-        addMarkersToMap(initialPlaces)
+//        val initialPlaces = listOf<Place>() // 이곳에 초기 위치 데이터를 넣으세요
+        addMarkersToMap(trip.places[0])
         // 나머지 설정...
     }
 
@@ -193,7 +193,6 @@ class TripFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun addMarkersToMap(places: List<Place>) {
-        clearMarkers()
         if (places.isNotEmpty()) {
             val boundsBuilder = LatLngBounds.Builder()
             for (place in places) {
