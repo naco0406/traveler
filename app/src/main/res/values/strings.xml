@@ -11,4 +11,5 @@
 <!--    <string name="kakao_native_app_key">kakao38a8100d38b0243704015d078da0dc9d</string>-->
     <!--    <string name="google_login_client_id">989926805865-4ncqdkd99u50h7bb57samo88p3qgj2vq.apps.googleusercontent.com</string>-->
     <string name="google_login_client_id">989926805865-md399gp24erioge2oihuj9eijmovgl3s.apps.googleusercontent.com</string>
+    <string name="server_ip">http://43.201.98.127:5000</string>
 </resources>
