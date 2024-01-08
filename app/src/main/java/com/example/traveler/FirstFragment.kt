@@ -50,8 +50,10 @@ class FirstFragment : Fragment() {
             "application/json; charset=utf-8".toMediaTypeOrNull(),
             "{\"name\":\"$name\"}"
         )
+        val serverIp = getString(R.string.server_ip)
+        val url = "$serverIp/search"
         val request = Request.Builder()
-            .url("http://43.200.170.97:5000/search")
+            .url(url)
             .post(requestBody)
             .build()
 

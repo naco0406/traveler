@@ -137,8 +137,10 @@ class SecondFragment : Fragment() {
 
     private fun fetchPlaces(callback: (List<PlaceData>) -> Unit) {
         val client = OkHttpClient()
+        val serverIp = getString(R.string.server_ip)
+        val url = "$serverIp/get_places"
         val request = Request.Builder()
-            .url("http://43.200.170.97:5000/get_places") // 서버의 URL로 변경하세요.
+            .url(url) // 서버의 URL로 변경하세요.
             .get() // 데이터를 가져오는 GET 요청입니다.
             .build()
 

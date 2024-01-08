@@ -73,7 +73,8 @@ class SignUpFragment : DialogFragment() {
         val client = OkHttpClient()
 
         // 서버 URL
-        val url = "http://43.200.170.97:5000/addPerson"
+        val serverIp = getString(R.string.server_ip)
+        val url = "$serverIp/addPerson"
 
         // JSON 데이터를 RequestBody로 변환
         val requestBody = RequestBody.create("application/json; charset=utf-8".toMediaTypeOrNull(), jsonData)
