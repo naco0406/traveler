@@ -9,21 +9,11 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.traveler.Place
 import com.example.traveler.R
 
-data class Trip (
-    val id: Int,
-    val city: String,
-    val period: Int,
-    val destinations: List<List<String>>,
-    val restaurant: List<List<String>>,
-    val lodging: List<String>,
-    val selected: Int,
-    val review: List<String>,
-)
 
-
-class TripDayAdapter(private val dayActivities: List<String>, private var selectedPosition: Int,
+class TripDayAdapter(private val dayActivities: List<Place>, private var selectedPosition: Int,
                      private val onItemClicked: (Int) -> Unit) :
     RecyclerView.Adapter<TripDayAdapter.ViewHolder>() {
 
@@ -34,7 +24,7 @@ class TripDayAdapter(private val dayActivities: List<String>, private var select
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val context = holder.itemView.context
-        val activity = dayActivities[position]
+        val activity = dayActivities[position].name
         holder.textView.text = activity
 
         // 카드 클릭 리스너 추가
@@ -70,16 +60,16 @@ class TripDayAdapter(private val dayActivities: List<String>, private var select
 
 // TripFragment
 class TripDayFragment : Fragment() {
-    private var dayActivities: List<String> = listOf()
+    private var dayActivities: List<Place> = listOf()
     private var selectedPosition: Int = -1
 
     companion object {
         private const val ARG_DAY_ACTIVITIES = "day_activities"
 
-        fun newInstance(dayActivities: List<String>): TripDayFragment =
+        fun newInstance(dayActivities: List<Place>): TripDayFragment =
             TripDayFragment().apply {
                 arguments = Bundle().apply {
-                    putStringArrayList(ARG_DAY_ACTIVITIES, ArrayList(dayActivities))
+                    putParcelableArrayList(ARG_DAY_ACTIVITIES, ArrayList(dayActivities))
                 }
             }
     }
@@ -87,7 +77,7 @@ class TripDayFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            dayActivities = it.getStringArrayList(ARG_DAY_ACTIVITIES).orEmpty()
+            dayActivities = it.getParcelableArrayList<Place>(ARG_DAY_ACTIVITIES) ?: listOf()
         }
     }
 
@@ -100,7 +90,7 @@ class TripDayFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = TripDayAdapter(dayActivities, selectedPosition) { position ->
             // 클릭된 항목 처리 로직
-            Toast.makeText(context, "Selected: ${dayActivities[position]}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Selected: ${dayActivities[position].name}", Toast.LENGTH_SHORT).show()
         }
         return view
     }
