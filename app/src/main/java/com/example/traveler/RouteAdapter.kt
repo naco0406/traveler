@@ -9,19 +9,18 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 
-data class TripItem(val name: String)
-class RouteAdapter(private val context: Context) : RecyclerView.Adapter<RouteAdapter.ViewHolder>() {
 
-    var datas = mutableListOf<String>()
+class RouteAdapter(private val routeList:List<String>) : RecyclerView.Adapter<RouteAdapter.ViewHolder>() {
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.route_item,parent,false)
         return ViewHolder(view)
     }
 
-    override fun getItemCount(): Int = datas.size
+    override fun getItemCount(): Int = routeList.size
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(datas[position])
+        holder.bind(routeList[position])
     }
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
