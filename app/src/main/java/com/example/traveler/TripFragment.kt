@@ -1,5 +1,6 @@
 // TripFragment.kt
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,14 +16,20 @@ import com.example.traveler.R
 import com.example.traveler.Trip
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.geometry.LatLngBounds
+import com.naver.maps.map.CameraAnimation
 import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.LocationTrackingMode
 import com.naver.maps.map.MapFragment
 import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.overlay.Marker
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import java.io.IOException
 
 class TripAdapter(private val trip: Trip) : RecyclerView.Adapter<TripAdapter.ViewHolder>() {
 
@@ -56,7 +63,7 @@ class TripAdapter(private val trip: Trip) : RecyclerView.Adapter<TripAdapter.Vie
 class TripFragment : Fragment(), OnMapReadyCallback {
     private lateinit var viewPager: ViewPager2
     private lateinit var tabs: TabLayout
-    private lateinit var trip: Trip
+    private var trip: Trip? = null
     private val markers = mutableListOf<Marker>()
     private lateinit var naverMap: NaverMap
     override fun onMapReady(naverMap: NaverMap) {
@@ -73,67 +80,98 @@ class TripFragment : Fragment(), OnMapReadyCallback {
         }
 
 //        val initialPlaces = listOf<Place>() // 이곳에 초기 위치 데이터를 넣으세요
-        addMarkersToMap(trip.places[0])
+        trip?.let { currentTrip ->
+            if (currentTrip.places.isNotEmpty()) {
+                addMarkersToMap(currentTrip.places[0])
+            }
+        }
         // 나머지 설정...
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // 데이터 로드 로직
-        val place1Day1 = Place(
-            name = "해운대 해수욕장",
-            city = "부산",
-            type = "해변",
-            mapx = 129.1586f,
-            mapy = 35.1587f,
-            address = "해운대구, 부산",
-            visited = 0,
-            tag = listOf("해변", "관광", "자연"),
-            img = R.drawable.img_hud // 예시 이미지 리소스
-        )
 
-        val place2Day1 = Place(
-            name = "부산 국제 시장",
-            city = "부산",
-            type = "시장",
-            mapx = 129.0225f,
-            mapy = 35.1028f,
-            address = "중구, 부산",
-            visited = 0,
-            tag = listOf("쇼핑", "음식", "문화"),
-            img = R.drawable.img_hud // 예시 이미지 리소스
-        )
+        fetchTrips()
 
-        val place1Day2 = Place(
-            name = "감천문화마을",
-            city = "부산",
-            type = "문화마을",
-            mapx = 129.0104f,
-            mapy = 35.0975f,
-            address = "사하구, 부산",
-            visited = 0,
-            tag = listOf("문화", "예술", "역사"),
-            img = R.drawable.img_hud // 예시 이미지 리소스
-        )
+        val client = OkHttpClient()
+        val serverIp = getString(R.string.server_ip)
+        val url = "$serverIp/get_trips"
+        val request = Request.Builder()
+            .url(url)
+            .build()
 
-// 여행 일정 구성
-        trip = Trip(
-            id = 1,
-            city = "부산",
-            period = 2, // 1박 2일
-            places = listOf(
-                listOf(place1Day1, place2Day1, place1Day1, place2Day1, place1Day1, place2Day1, place1Day1, place2Day1),
-                listOf(place1Day2, place1Day2, place1Day2)
-            ),
-            selected = 0,
-            review = listOf(
-                "해운대 해수욕장은 정말 멋졌어요!",
-                "국제 시장의 다양한 먹거리를 즐겼습니다.",
-                "감천문화마을의 예술적인 분위기가 인상적이었어요."
-            )
-        )
-
+//        client.newCall(request).enqueue(object : okhttp3.Callback {
+//            override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
+//                if (response.isSuccessful) {
+//                    val responseBody = response.body?.string()
+//                    Log.d("TripFragment", "Response from server: $responseBody")
+//
+//                    // Gson을 사용하여 JSON 응답을 List<Trip>으로 변환
+//                    val tripListType = object : TypeToken<List<Trip>>() {}.type
+//                    val trips = Gson().fromJson<List<Trip>>(responseBody, tripListType)
+//
+//                    // 첫 번째 Trip 객체 사용
+//                    if (trips.isNotEmpty()) {
+//                        activity?.runOnUiThread {
+//                            trip = trips[0]
+//                            // UI 업데이트 로직
+//                            viewPager.adapter?.notifyDataSetChanged()
+//                        }
+//                    }
+//                } else {
+//                    Log.e("TripFragment", "Response not successful")
+//                }
+//            }
+//
+//            override fun onFailure(call: okhttp3.Call, e: IOException) {
+//                Log.e("TripFragment", "Error fetching trips", e)
+//            }
+//        })
     }
+    private fun fetchTrips() {
+        val client = OkHttpClient()
+        val serverIp = getString(R.string.server_ip)
+        val url = "$serverIp/get_trips"
+        val request = Request.Builder().url(url).build()
+
+        client.newCall(request).enqueue(object : okhttp3.Callback {
+            override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
+                if (response.isSuccessful) {
+                    val responseBody = response.body?.string()
+                    Log.d("TripFragment", "Response from server: $responseBody")
+
+                    val tripListType = object : TypeToken<List<Trip>>() {}.type
+                    val trips = Gson().fromJson<List<Trip>>(responseBody, tripListType)
+
+                    if (trips.isNotEmpty()) {
+                        activity?.runOnUiThread {
+                            trip = trips[0]
+                            initializeUI()
+                        }
+                    }
+                } else {
+                    Log.e("TripFragment", "Response not successful")
+                }
+            }
+
+            override fun onFailure(call: okhttp3.Call, e: IOException) {
+                Log.e("TripFragment", "Error fetching trips", e)
+            }
+        })
+    }
+    private fun initializeUI() {
+        trip?.let { currentTrip ->
+            viewPager.adapter = TripViewPagerAdapter(requireActivity(), currentTrip)
+            TabLayoutMediator(tabs, viewPager) { tab, position ->
+                tab.text = "Day ${position + 1}"
+            }.attach()
+
+            if (isMapInitialized()) {
+                addMarkersToMap(currentTrip.places[0])
+            }
+        }
+    }
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -144,10 +182,12 @@ class TripFragment : Fragment(), OnMapReadyCallback {
         tabs = view.findViewById(R.id.tabs)
 
         // ViewPager2와 TabLayout 설정
-        viewPager.adapter = TripViewPagerAdapter(requireActivity(), trip)
-        TabLayoutMediator(tabs, viewPager) { tab, position ->
-            tab.text = "Day ${position + 1}"
-        }.attach()
+        trip?.let { currentTrip ->
+            viewPager.adapter = TripViewPagerAdapter(requireActivity(), currentTrip)
+            TabLayoutMediator(tabs, viewPager) { tab, position ->
+                tab.text = "Day ${position + 1}"
+            }.attach()
+        }
 
         val fm = childFragmentManager
         val mapFragment = fm.findFragmentById(R.id.map_view) as MapFragment?
@@ -176,8 +216,12 @@ class TripFragment : Fragment(), OnMapReadyCallback {
 
     private fun updateMarkersForPosition(position: Int) {
         if (isMapInitialized()) {
-            clearMarkers() // 이전 마커들을 모두 제거
-            addMarkersToMap(trip.places[position]) // 새 위치에 대한 마커들 추가
+            trip?.let { currentTrip ->
+                if (position < currentTrip.places.size) {
+                    clearMarkers() // 이전 마커들을 모두 제거
+                    addMarkersToMap(currentTrip.places[position]) // 새 위치에 대한 마커들 추가
+                }
+            }
         }
     }
 
@@ -208,6 +252,10 @@ class TripFragment : Fragment(), OnMapReadyCallback {
             val bounds = boundsBuilder.build()
             val cameraUpdate = CameraUpdate.fitBounds(bounds)
             naverMap.moveCamera(cameraUpdate)
+
+            val zoomOutUpdate = CameraUpdate.zoomOut().animate(CameraAnimation.Easing)
+            naverMap.moveCamera(zoomOutUpdate)
+
         } else {
             // 좌표가 없을 경우, 기본 위치로 카메라를 이동하거나 다른 처리를 수행
             // 예: naverMap.moveCamera(CameraUpdate.scrollTo(DEFAULT_LAT_LNG))

@@ -90,7 +90,7 @@ class SecondFragment : Fragment() {
 
                 // 슬라이드 오프셋에 따라서 가로 길이를 변경
                 val startWidth = 75f // 시작 가로 길이 (50dp)
-                val endWidth = 375f // 끝 가로 길이 (300dp)
+                val endWidth = 350f // 끝 가로 길이 (300dp)
                 val newWidth = startWidth + (endWidth - startWidth) * slideOffset
                 val widthInPixels = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, newWidth, resources.displayMetrics).toInt()
                 val layoutParams = bottomSheetCityCard.layoutParams
@@ -119,7 +119,7 @@ class SecondFragment : Fragment() {
                 bottomSheetToolbar.layoutParams = toolbarLayoutParams
 
                 // 슬라이드 오프셋에 따라서 이미지를 가운데 정렬
-                val startImageSpaceWidth = 300f
+                val startImageSpaceWidth = 250f
                 val endImageSpaceWidth = 0f
                 val newImageSpaceWidth = startImageSpaceWidth + (endImageSpaceWidth - startImageSpaceWidth) * slideOffset
                 val imageSpaceWidthInPixels = TypedValue.applyDimension(
