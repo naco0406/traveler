@@ -19,43 +19,160 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardElevation="10dp"
-            app:cardCornerRadius="16dp">
+            app:cardCornerRadius="20dp">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:background="@color/white"
-                android:padding="16dp">
+                android:background="@color/white">
                 <LinearLayout
-                    android:id="@+id/placelinearLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="8dp"
-                    android:orientation="horizontal">
-                    <!-- 이미지 뷰들 -->
-                    <ImageView
-                        android:id="@+id/imageView1"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
-                        android:layout_weight="1"
-                        android:src="@drawable/img_gwm" />
-                    <ImageView
-                        android:id="@+id/imageView2"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
-                        android:layout_weight="1"
-                        android:src="@drawable/img_hud" />
-                    <ImageView
-                        android:id="@+id/imageView3"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
-                        android:layout_weight="1"
-                        android:src="@drawable/img_gwm" />
+                    android:orientation="vertical"
+                    android:padding="16dp">
+                    <LinearLayout
+                        android:id="@+id/bottomSheetToolbar"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+                        <ImageButton
+                            android:id="@+id/bottomSheetDownButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="start|top"
+                            android:background="@android:color/transparent"
+                            android:layout_margin="8dp"
+                            android:src="@drawable/outline_keyboard_arrow_down_24"
+                            app:tint="@color/black"/>
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_horizontal">
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="75dp"
+                            android:layout_height="75dp"
+                            app:cardCornerRadius="10dp"
+                            android:layout_gravity="center_horizontal"
+                            android:id="@+id/bottomSheetCityImage">
+                            <ImageView
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:src="@drawable/img_gwm"
+                                android:scaleType="centerCrop"/>
+                        </androidx.cardview.widget.CardView>
+                        <FrameLayout
+                            android:id="@+id/bottomSheetImageSpace"
+                            android:layout_width="300dp"
+                            android:layout_height="75dp">
+                            <LinearLayout
+                                android:layout_width="280dp"
+                                android:layout_height="match_parent"
+                                android:orientation="vertical"
+                                android:gravity="center_vertical"
+                                android:layout_marginTop="8dp"
+                                android:layout_marginBottom="8dp"
+                                android:layout_marginLeft="24dp"
+                                android:id="@+id/bottomSheetInfo">
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center_vertical"
+                                    android:orientation="horizontal">
+                                    <ImageView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="match_parent"
+                                        android:src="@drawable/round_location_on_24"/>
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="서울"
+                                        android:textSize="20sp"
+                                        android:textColor="@color/black"
+                                        android:layout_gravity="center_vertical"
+                                        android:paddingLeft="8dp"/>
+                                </LinearLayout>
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="8dp"
+                                    android:layout_gravity="center_vertical"
+                                    android:orientation="horizontal">
+                                    <ImageView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:src="@drawable/round_date_range_24"/>
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="2박 3일"
+                                        android:textColor="@color/black"
+                                        android:layout_gravity="center_vertical"
+                                        android:paddingLeft="8dp"/>
+                                </LinearLayout>
+                            </LinearLayout>
+                            <ImageButton
+                                android:id="@+id/bottomSheetMapButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/round_map_36"
+                                android:background="@android:color/transparent"
+                                android:layout_gravity="end|center_vertical"/>
+                        </FrameLayout>
+                    </LinearLayout>
                 </LinearLayout>
+
+
+                <LinearLayout
+                    android:id="@+id/bottomSheetContent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:alpha="0">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="내 여정"
+                        android:textColor="@color/black"
+                        android:textStyle="bold"
+                        android:textSize="25dp"
+                        android:padding="16dp"/>
+                    <LinearLayout
+                        android:id="@+id/placelinearLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="8dp"
+                        android:orientation="horizontal">
+                        <!-- 이미지 뷰들 -->
+                        <ImageView
+                            android:id="@+id/imageView1"
+                            android:layout_width="100dp"
+                            android:layout_height="100dp"
+                            android:layout_weight="1"
+                            android:src="@drawable/img_gwm" />
+                        <ImageView
+                            android:id="@+id/imageView2"
+                            android:layout_width="100dp"
+                            android:layout_height="100dp"
+                            android:layout_weight="1"
+                            android:src="@drawable/img_hud" />
+                        <ImageView
+                            android:id="@+id/imageView3"
+                            android:layout_width="100dp"
+                            android:layout_height="100dp"
+                            android:layout_weight="1"
+                            android:src="@drawable/img_gwm" />
+                    </LinearLayout>
+                </LinearLayout>
+
+
                 <Space
                     android:layout_width="match_parent"
-                    android:layout_height="5000dp"/>
+                    android:layout_height="500dp"/>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
     </LinearLayout>
@@ -94,10 +211,12 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
+            android:background="@color/black"
             android:layout_below="@+id/toolbar">
             <ScrollView
                 android:layout_width="match_parent"
-                android:layout_height="400dp"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="175dp"
                 android:id="@+id/lockScrollView"
                 android:scrollbars="none"
                 android:overScrollMode="never">
@@ -112,23 +231,19 @@
                         android:paddingLeft="16dp"
                         android:paddingRight="16dp"
                         android:text="지금 핫한 도시"/>
-                    <HorizontalScrollView
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:scrollbars="none"
-                        android:overScrollMode="never">
+                        android:orientation="horizontal">
 
-                        <LinearLayout
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/recyclerViewCity"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal">
-
-                            <androidx.recyclerview.widget.RecyclerView
-                                android:id="@+id/recyclerViewCity"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent" />
-                        </LinearLayout>
-                    </HorizontalScrollView>
+                            android:orientation="horizontal"
+                            android:scrollbars="none"
+                            android:overScrollMode="never"/>
+                    </LinearLayout>
 
                     <android.widget.Space
                         android:layout_width="0dp"
@@ -139,23 +254,19 @@
                         android:paddingLeft="16dp"
                         android:paddingRight="16dp"
                         android:text="지금 핫한 여행지"/>
-                    <HorizontalScrollView
+
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:scrollbars="none"
-                        android:overScrollMode="never">
+                        android:orientation="horizontal">
 
-                        <LinearLayout
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/recyclerViewPlace"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal">
-
-                            <androidx.recyclerview.widget.RecyclerView
-                                android:id="@+id/recyclerViewPlace"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent" />
-                        </LinearLayout>
-                    </HorizontalScrollView>
+                            android:layout_height="match_parent"
+                            android:scrollbars="none"
+                            android:overScrollMode="never"/>
+                    </LinearLayout>
 
                     <android.widget.Space
                         android:layout_width="0dp"

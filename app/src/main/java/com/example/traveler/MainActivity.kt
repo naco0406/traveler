@@ -34,7 +34,7 @@ public class MainActivity : AppCompatActivity() {
 
         tabLayout = findViewById(R.id.tabLayout)
         viewPager.adapter = ViewPager2Adapter(this)
-        viewPager.setCurrentItem(1,false)
+        viewPager.setCurrentItem(0,false)
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
 //            when (position) {
 //                0 -> tab.text = "Tab1"
@@ -48,14 +48,18 @@ public class MainActivity : AppCompatActivity() {
             when (position) {
                 0 -> {
                     tabIcon.setImageResource(R.drawable.round_home_24)
-                    tabIcon.setColorFilter(ContextCompat.getColor(this, R.color.black))
+                    tabIcon.setColorFilter(ContextCompat.getColor(this, R.color.select))
                 }
                 1 -> {
                     tabIcon.setImageResource(R.drawable.round_favorite_24)
-                    tabIcon.setColorFilter(ContextCompat.getColor(this, R.color.select))
+                    tabIcon.setColorFilter(ContextCompat.getColor(this, R.color.black))
                 }
                 2 -> {
                     tabIcon.setImageResource(R.drawable.round_person_24)
+                    tabIcon.setColorFilter(ContextCompat.getColor(this, R.color.black))
+                }
+                3 -> {
+                    tabIcon.setImageResource(R.drawable.round_map_24)
                     tabIcon.setColorFilter(ContextCompat.getColor(this, R.color.black))
                 }
             }

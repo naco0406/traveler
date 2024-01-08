@@ -15,8 +15,8 @@ class ViewPager2Adapter(fragmentActivity: FragmentActivity) : FragmentStateAdapt
 
     override fun createFragment(position: Int): Fragment {
         return when (position) {
-            0 -> FirstFragment()
-            1 -> SecondFragment()
+            0 -> SecondFragment()
+            1 -> FirstFragment()
             2 -> ThirdFragment()
             3 -> MapFragment()
             else -> throw IndexOutOfBoundsException("Invalid fragment position")

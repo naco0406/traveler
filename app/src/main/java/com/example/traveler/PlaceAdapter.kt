@@ -34,7 +34,9 @@ class PlaceAdapter(private val context: Context) : RecyclerView.Adapter<PlaceAda
 
         fun bind(item: PlaceData) {
             txtName.text = item.name
-            Glide.with(itemView).load(item.img).into(imgProfile)
+            Glide.with(itemView)
+                .load(item.img)
+                .into(imgProfile)
 
         }
     }
