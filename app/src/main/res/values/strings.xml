@@ -2,9 +2,13 @@
     <string name="app_name">traveler</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="naver_search_client_id">F4_IHRPCWoZzrELLLVga</string>
+    <string name="naver_search_client_secret">FqfHl2o2KE</string>
+    <string name="naver_maps_client_id">otceryyn7h</string>
+    <string name="naver_maps_client_secret">bvsTn1Mqg1WEkKGxmWaL6nV56Ummj3HXkLWV5der</string>
     <string name="naver_client_id">kqlOkK3JaKGv29hlSGFK</string>
     <string name="naver_client_secret">PdekRrDzXY</string>
-    <string name="kakao_native_app_key">kakao38a8100d38b0243704015d078da0dc9d</string>
+<!--    <string name="kakao_native_app_key">kakao38a8100d38b0243704015d078da0dc9d</string>-->
     <!--    <string name="google_login_client_id">989926805865-4ncqdkd99u50h7bb57samo88p3qgj2vq.apps.googleusercontent.com</string>-->
     <string name="google_login_client_id">989926805865-md399gp24erioge2oihuj9eijmovgl3s.apps.googleusercontent.com</string>
     <string name="server_ip">http://43.201.98.127:5000</string>

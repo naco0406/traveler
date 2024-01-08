@@ -24,5 +24,12 @@
 <!--            android:layout_width="match_parent"-->
 <!--            android:layout_height="match_parent" />-->
     </androidx.constraintlayout.widget.ConstraintLayout>
+    <TextView
+        android:id="@+id/textview_test"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="Hello World!"
+        android:textSize="16sp"
+        android:gravity="center"/>
 </FrameLayout>
 
