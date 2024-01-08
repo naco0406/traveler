@@ -16,6 +16,9 @@ import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.FragmentTransaction
+import com.navercorp.nid.NaverIdLoginSDK
+import com.navercorp.nid.oauth.NidOAuthLogin
+import com.navercorp.nid.oauth.OAuthLoginCallback
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -57,8 +60,8 @@ class MyPageFragment : Fragment() {
 
         try {
             val content = file.readText()
-            val jsonObject = JSONObject(content)
-            val myData = JSONObject(content).getJSONObject("UserData")
+            Log.e(TAG, "저장되어 있던 my data 불러오기: $content")
+            val myData = JSONObject(content)
             myname.text = myData.getString("name")
             myphone.text = myData.getString("phone")
             mynickname.text = myData.getString("nickname")
@@ -68,6 +71,9 @@ class MyPageFragment : Fragment() {
 
             //logout 버튼 누르면 다시 login fragment로 이동
             button_logout.setOnClickListener {
+                val content = file.readText()
+                val myData = JSONObject(content)
+                Log.e(TAG, myData.toString())
                 val user = Person(myData.getString("name"), myData.getString("phone"), myData.getString("nickname"), "")
                 updateMember(user)
                 parentFragmentManager.beginTransaction().apply{
@@ -76,6 +82,25 @@ class MyPageFragment : Fragment() {
                     addToBackStack(null)
                     commit()
                     }
+
+                NidOAuthLogin().callDeleteTokenApi(object : OAuthLoginCallback {
+                    override fun onSuccess() {
+                        //서버에서 토큰 삭제에 성공한 상태입니다.
+                        Log.e(TAG, "success in logout")
+
+                    }
+                    override fun onFailure(httpStatus: Int, message: String) {
+                        // 서버에서 토큰 삭제에 실패했어도 클라이언트에 있는 토큰은 삭제되어 로그아웃된 상태입니다.
+                        // 클라이언트에 토큰 정보가 없기 때문에 추가로 처리할 수 있는 작업은 없습니다.
+                        Log.d(TAG, "errorCode: ${NaverIdLoginSDK.getLastErrorCode().code}")
+                        Log.d(TAG, "errorDesc: ${NaverIdLoginSDK.getLastErrorDescription()}")
+                    }
+                    override fun onError(errorCode: Int, message: String) {
+                        // 서버에서 토큰 삭제에 실패했어도 클라이언트에 있는 토큰은 삭제되어 로그아웃된 상태입니다.
+                        // 클라이언트에 토큰 정보가 없기 때문에 추가로 처리할 수 있는 작업은 없습니다.
+                        onFailure(errorCode, message)
+                    }
+                })
 
 
             }
@@ -123,16 +148,21 @@ class MyPageFragment : Fragment() {
                 requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(editingButton.windowToken, 0)
 
-            //file 불러오기
+            //내부 저장소 파일 업데이트
             val fileName = "Mypage.json"
             val internalStorageDir = requireActivity().applicationContext.getFilesDir()
             val file = File(internalStorageDir, fileName)
             val content = file.readText()
-            val jsonObject = JSONObject(content)
-            Log.d("editInfo", "jsonObject: $jsonObject")
-            jsonObject.put(target_key, target_text)
-            Log.d("editInfo", "jsonObject: $jsonObject")
-            file.writeText(jsonObject.toString())
+
+            val myData = JSONObject(content)
+            myData.put(target_key, target_text.text.toString())
+            Log.e(TAG,target_text.text.toString())
+            Log.e(TAG, myData.toString())
+            file.writeText(myData.toString())
+
+            //데이터 베이스 업데이트
+            val user = Person(myData.getString("name"), myData.getString("phone"), myData.getString("nickname"), "")
+            updateMember(user)
 
             true
 
