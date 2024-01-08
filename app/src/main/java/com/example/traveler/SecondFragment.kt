@@ -4,13 +4,19 @@ import android.animation.LayoutTransition
 import android.os.Bundle
 import android.transition.TransitionManager
 import android.util.Log
+import android.util.TypedValue
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
+import android.widget.ImageButton
+import androidx.cardview.widget.CardView
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ScrollView
+import android.widget.Space
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -27,10 +33,7 @@ import java.io.IOException
 class SecondFragment : Fragment() {
 
     private lateinit var cityAdapter: CityAdapter
-    val data_city = mutableListOf<CityData>()
-
     private lateinit var placeAdapter: PlaceAdapter
-    val data_place = mutableListOf<PlaceData>()
 
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<View>
     override fun onCreateView(
@@ -47,6 +50,12 @@ class SecondFragment : Fragment() {
         val bottomSheet = view.findViewById<LinearLayout>(R.id.bottom_sheet)
         val scrollView = view.findViewById<ScrollView>(R.id.lockScrollView)
         val toolbar = view.findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
+        val bottomSheetCityCard = view.findViewById<CardView>(R.id.bottomSheetCityImage)
+        val bottomSheetImageSpace = view.findViewById<FrameLayout>(R.id.bottomSheetImageSpace)
+        val bottomSheetToolbar = view.findViewById<LinearLayout>(R.id.bottomSheetToolbar)
+        val bottomSheetMapButton = view.findViewById<ImageButton>(R.id.bottomSheetMapButton)
+        val bottomSheetInfo = view.findViewById<LinearLayout>(R.id.bottomSheetInfo)
+        val bottomSheetContent = view.findViewById<LinearLayout>(R.id.bottomSheetContent)
 
         val placelinearLayout = view.findViewById<LinearLayout>(R.id.placelinearLayout)
         placelinearLayout.layoutTransition = LayoutTransition()
@@ -66,13 +75,11 @@ class SecondFragment : Fragment() {
                         Log.d("bottomSheet", "Expanded")
                         scrollView.isVisible = false
                         toolbar.isVisible = false
-//                        placelinearLayout.orientation = LinearLayout.VERTICAL
                     }
                     BottomSheetBehavior.STATE_COLLAPSED -> {
                         Log.d("bottomSheet", "Collapsed")
                         scrollView.isVisible = true
                         toolbar.isVisible = true
-//                        placelinearLayout.orientation = LinearLayout.HORIZONTAL
                     }
                 }
             }
@@ -80,6 +87,63 @@ class SecondFragment : Fragment() {
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
                 scrollView.isVisible = true
                 toolbar.isVisible = true
+
+                // 슬라이드 오프셋에 따라서 가로 길이를 변경
+                val startWidth = 75f // 시작 가로 길이 (50dp)
+                val endWidth = 375f // 끝 가로 길이 (300dp)
+                val newWidth = startWidth + (endWidth - startWidth) * slideOffset
+                val widthInPixels = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, newWidth, resources.displayMetrics).toInt()
+                val layoutParams = bottomSheetCityCard.layoutParams
+                layoutParams.width = widthInPixels
+                layoutParams.height = widthInPixels
+                bottomSheetCityCard.layoutParams = layoutParams
+
+                // 슬라이드 오프셋에 따라서 이미지 모서리 둥근 정도를 변경
+                val startRadius = 10f // 시작 모서리 둥글기 (10dp)
+                val endRadius = 30f // 끝 모서리 둥글기 (30dp)
+                val newRadius = startRadius + (endRadius - startRadius) * slideOffset
+                val radiusInPixels = TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_DIP, newRadius, resources.displayMetrics
+                )
+                bottomSheetCityCard.radius = radiusInPixels
+
+                // 슬라이드 오프셋에 따라서 툴바 높이를 변경
+                val startToolbarHeight = 0f
+                val endToolbarHeight = 40f
+                val newToolbarHeight = startToolbarHeight + (endToolbarHeight - startToolbarHeight) * slideOffset
+                val toolbarHeightInPixels = TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_DIP, newToolbarHeight, resources.displayMetrics
+                ).toInt()
+                val toolbarLayoutParams = bottomSheetToolbar.layoutParams
+                toolbarLayoutParams.height = toolbarHeightInPixels
+                bottomSheetToolbar.layoutParams = toolbarLayoutParams
+
+                // 슬라이드 오프셋에 따라서 이미지를 가운데 정렬
+                val startImageSpaceWidth = 300f
+                val endImageSpaceWidth = 0f
+                val newImageSpaceWidth = startImageSpaceWidth + (endImageSpaceWidth - startImageSpaceWidth) * slideOffset
+                val imageSpaceWidthInPixels = TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_DIP, newImageSpaceWidth, resources.displayMetrics
+                ).toInt()
+                val imageSpaceLayoutParams = bottomSheetImageSpace.layoutParams
+                imageSpaceLayoutParams.width = imageSpaceWidthInPixels
+                bottomSheetImageSpace.layoutParams = imageSpaceLayoutParams
+
+                // 슬라이드 오프셋에 따라 지도 버튼, 정보 표시의 투명도 조절
+                val startAlpha = 1f // 시작 투명도 (완전 불투명)
+                val endAlpha = 0f // 끝 투명도 (완전 투명)
+                val newAlpha = startAlpha + (endAlpha - startAlpha) * slideOffset * 2
+                val adjustedAlpha = if (newAlpha < 0) 0f else newAlpha
+                bottomSheetMapButton.alpha = adjustedAlpha
+                bottomSheetInfo.alpha = adjustedAlpha
+
+                // 슬라이드 오프셋에 따라서 내용 표시의 투명도 조절
+                val startContentAlpha = 0f // 시작 투명도 (완전 투명)
+                val endContentAlpha = 1f // 끝 투명도 (완전 불투명)
+                val newContentAlpha = startContentAlpha + (endContentAlpha - startContentAlpha) * slideOffset
+                bottomSheetContent.alpha = newContentAlpha
+
+
             }
         })
 
@@ -104,18 +168,12 @@ class SecondFragment : Fragment() {
         context.let {
             rv_city.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         }
-        data_city.apply {
-            add(CityData(name = "서울", img = R.drawable.img_gwm))
-            add(CityData(name = "부산", img = R.drawable.img_hud))
-            add(CityData(name = "대전", img = R.drawable.img_gwm))
-            add(CityData(name = "울산", img = R.drawable.img_hud))
-            add(CityData(name = "광주", img = R.drawable.img_gwm))
-            add(CityData(name = "대구", img = R.drawable.img_hud))
-            add(CityData(name = "인천", img = R.drawable.img_gwm))
-            add(CityData(name = "세종", img = R.drawable.img_hud))
+        fetchCities { cities ->
+            cityAdapter.datas = cities.toMutableList()
+            activity?.runOnUiThread {
+                cityAdapter.notifyDataSetChanged()
+            }
         }
-        cityAdapter.datas = data_city
-        cityAdapter.notifyDataSetChanged()
 
 
         val rv_place = view.findViewById<RecyclerView>(R.id.recyclerViewPlace)
@@ -134,11 +192,50 @@ class SecondFragment : Fragment() {
         }
 
     }
+    private fun fetchCities(callback: (List<CityData>) -> Unit) {
+        val client = OkHttpClient()
+        val serverIp = getString(R.string.server_ip)
+        val url = "$serverIp/get_cities_rank"
+        val request = Request.Builder()
+            .url(url) // 서버의 URL로 변경하세요.
+            .get() // 데이터를 가져오는 GET 요청입니다.
+            .build()
 
+        client.newCall(request).enqueue(object : Callback {
+            override fun onResponse(call: Call, response: Response) {
+                response.body?.string()?.let { jsonString ->
+                    val cityDataList = parseCityData(jsonString) // JSON을 파싱하는 함수를 호출합니다.
+                    Log.d("placeCityList", cityDataList.toString())
+                    callback(cityDataList)
+                }
+            }
+
+            override fun onFailure(call: Call, e: IOException) {
+                // 오류 처리
+                e.printStackTrace()
+            }
+        })
+    }
+
+    private fun parseCityData(jsonString: String): List<CityData> {
+        val cityDataList = mutableListOf<CityData>()
+        try {
+            val jsonArray = JSONArray(jsonString)
+            for (i in 0 until jsonArray.length()) {
+                val jsonObject = jsonArray.getJSONObject(i)
+                val name = jsonObject.getString("name")
+                val image = jsonObject.getString("image")
+                cityDataList.add(CityData(name = name, img = image))
+            }
+        } catch (e: JSONException) {
+            e.printStackTrace()
+        }
+        return cityDataList
+    }
     private fun fetchPlaces(callback: (List<PlaceData>) -> Unit) {
         val client = OkHttpClient()
         val serverIp = getString(R.string.server_ip)
-        val url = "$serverIp/get_places"
+        val url = "$serverIp/get_places_rank"
         val request = Request.Builder()
             .url(url) // 서버의 URL로 변경하세요.
             .get() // 데이터를 가져오는 GET 요청입니다.

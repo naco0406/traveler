@@ -153,6 +153,7 @@ class MyPageFragment : Fragment() {
             val internalStorageDir = requireActivity().applicationContext.getFilesDir()
             val file = File(internalStorageDir, fileName)
             val content = file.readText()
+
             val myData = JSONObject(content)
             myData.put(target_key, target_text.text.toString())
             Log.e(TAG,target_text.text.toString())
@@ -171,11 +172,12 @@ class MyPageFragment : Fragment() {
     }
 
     private fun updateMember(user:Person) {
-
+        Log.d("updateMember", "user: $user")
         val client = OkHttpClient()
         val jsonString = toJson(user).toString()
+        Log.d("updateMember", "jsonString: $jsonString")
         val requestBody = RequestBody.create("application/json; charset=utf-8".toMediaTypeOrNull(), jsonString)
-
+        Log.d("updateMember", "requestBody: $requestBody")
         val serverIp = getString(R.string.server_ip)
         val url = "$serverIp/updateUser"
         val request = Request.Builder()

@@ -11,7 +11,7 @@ import com.bumptech.glide.Glide
 
 data class CityData (
     val name : String,
-    val img : Int
+    val img : String
 )
 class CityAdapter(private val context: Context) : RecyclerView.Adapter<CityAdapter.ViewHolder>() {
 
