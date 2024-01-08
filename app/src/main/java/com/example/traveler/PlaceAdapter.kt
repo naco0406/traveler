@@ -13,6 +13,7 @@ data class PlaceData (
     val name : String,
     val img : Int
 )
+
 class PlaceAdapter(private val context: Context) : RecyclerView.Adapter<PlaceAdapter.ViewHolder>() {
 
     var datas = mutableListOf<PlaceData>()

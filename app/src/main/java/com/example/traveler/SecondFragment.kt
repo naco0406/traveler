@@ -204,6 +204,7 @@ class SecondFragment : Fragment() {
         client.newCall(request).enqueue(object : Callback {
             override fun onResponse(call: Call, response: Response) {
                 response.body?.string()?.let { jsonString ->
+
                     val cityDataList = parseCityData(jsonString) // JSON을 파싱하는 함수를 호출합니다.
                     Log.d("placeCityList", cityDataList.toString())
                     callback(cityDataList)
