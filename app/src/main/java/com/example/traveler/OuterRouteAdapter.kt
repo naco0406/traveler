@@ -5,8 +5,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.traveler.R
 import com.example.traveler.RouteAdapter
+import com.example.traveler.Trip
 
-class OuterRouteAdapter(private val OuterRouteList: List<List<String>>):RecyclerView.Adapter<OuterRouteAdapter.ViewHolder>() {
+class OuterRouteAdapter(private var OuterRouteList: List<Trip>):RecyclerView.Adapter<OuterRouteAdapter.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val itemView = LayoutInflater.from(parent.context)
             .inflate(R.layout.inner_route_item, parent, false)
@@ -14,8 +15,8 @@ class OuterRouteAdapter(private val OuterRouteList: List<List<String>>):Recycler
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val routeList = OuterRouteList[position]
-        holder.bind(routeList)
+        val route = OuterRouteList[position]
+        holder.bind(route)
     }
 
     override fun getItemCount(): Int {
@@ -25,11 +26,17 @@ class OuterRouteAdapter(private val OuterRouteList: List<List<String>>):Recycler
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val innerRecyclerView: RecyclerView = itemView.findViewById(R.id.inner_recyclerView)
 
-        fun bind(routeList: List<String>) {
+        fun bind(routeList: Trip) {
             // Inner RecyclerView Setup
-            val innerAdapter = RouteAdapter(routeList)
+            val places = routeList.places[0]
+            val innerAdapter = RouteAdapter(places)
             innerRecyclerView.layoutManager = LinearLayoutManager(itemView.context, LinearLayoutManager.HORIZONTAL, false)
             innerRecyclerView.adapter = innerAdapter
         }
+    }
+
+    fun updateData(newItemList: List<Trip>) {
+        OuterRouteList = newItemList
+        notifyDataSetChanged()
     }
 }

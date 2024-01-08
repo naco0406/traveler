@@ -10,7 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
-class RouteFragment : Fragment() {
+class RouteFragment(private val routeData: Trip) : Fragment() {
 
     private lateinit var RouteAdapter: RouteAdapter
 
@@ -21,9 +21,9 @@ class RouteFragment : Fragment() {
         val view = inflater.inflate(R.layout.inner_route_item, container, false)
 
         // Sample data for OuterRouteAdapter
-        val RouteList = listOf("Place A", "Place B", "Place C")
         // Create OuterRouteAdapter
-        RouteAdapter = RouteAdapter(RouteList)
+        val places = routeData.places[0]
+        RouteAdapter = RouteAdapter(places)
 
         // Set up RecyclerView
         val innerRecyclerView: RecyclerView = view.findViewById(R.id.inner_recyclerView)

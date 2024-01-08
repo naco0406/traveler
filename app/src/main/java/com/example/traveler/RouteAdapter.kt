@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 
 
-class RouteAdapter(private val routeList:List<String>) : RecyclerView.Adapter<RouteAdapter.ViewHolder>() {
+class RouteAdapter(private val routeList:List<Place>) : RecyclerView.Adapter<RouteAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.route_item,parent,false)
@@ -27,8 +27,8 @@ class RouteAdapter(private val routeList:List<String>) : RecyclerView.Adapter<Ro
 
         private val txtName: TextView = view.findViewById(R.id.place_name)
 
-        fun bind(item: String) {
-            txtName.text = item
+        fun bind(item: Place) {
+            txtName.text = item.name
 
         }
     }
