@@ -1,5 +1,6 @@
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.traveler.Place
 import com.example.traveler.R
+import com.example.traveler.SearchPlaceFragment
 
 
 class MyTripDayAdapter(
@@ -65,25 +67,31 @@ class MyTripDayAdapter(
 
                 notifyItemChanged(previouslyExpanded)
                 notifyItemChanged(selectedPosition)
+
                 onItemClicked(position)
             }
 
-            // 확장된 항목에 대한 뷰 높이 및 연결선 길이 조정
-            if (selectedPosition == position) {
-                itemHolder.cardLinearLayout.layoutParams.height = 300/* 확장된 높이 값 */
-                itemHolder.topConnectorLine.layoutParams.height = 300/* 확장된 선의 길이 */
-                itemHolder.bottomConnectorLine.layoutParams.height = 300/* 확장된 선의 길이 */
-            } else {
-                itemHolder.cardLinearLayout.layoutParams.height = 130/* 기본 높이 값 */
-                itemHolder.topConnectorLine.layoutParams.height = 130/* 기본 선의 길이 */
-                itemHolder.bottomConnectorLine.layoutParams.height = 130/* 기본 선의 길이 */
-            }
+//            // 확장된 항목에 대한 뷰 높이 및 연결선 길이 조정
+//            if (selectedPosition == position) {
+//                itemHolder.cardLinearLayout.layoutParams.height = 300/* 확장된 높이 값 */
+//                itemHolder.topConnectorLine.layoutParams.height = 300/* 확장된 선의 길이 */
+//                itemHolder.bottomConnectorLine.layoutParams.height = 300/* 확장된 선의 길이 */
+//            } else {
+//                itemHolder.cardLinearLayout.layoutParams.height = 150/* 기본 높이 값 */
+//                itemHolder.topConnectorLine.layoutParams.height = 150/* 기본 선의 길이 */
+//                itemHolder.bottomConnectorLine.layoutParams.height = 150/* 기본 선의 길이 */
+//            }
+            itemHolder.cardLinearLayout.layoutParams.height = 150/* 기본 높이 값 */
+            itemHolder.topConnectorLine.layoutParams.height = 150/* 기본 선의 길이 */
+            itemHolder.bottomConnectorLine.layoutParams.height = 150/* 기본 선의 길이 */
+            // 장소 변경 로직
             itemHolder.cardView.requestLayout() // 레이아웃 갱신
         } else {
             // '장소 추가' 버튼 로직
             val addButtonHolder = holder as AddPlaceViewHolder
             addButtonHolder.btnAddPlace.setOnClickListener {
                 // 장소 추가 로직
+                onItemClicked(dayActivities.size)
             }
         }
     }
@@ -110,16 +118,65 @@ class MyTripDayAdapter(
 class MyTripDayFragment : Fragment() {
     private var dayActivities: MutableList<Place> = mutableListOf()
     private var selectedPosition: Int = -1
+    private var onAddPlaceClicked: (() -> Unit)? = null
+    private var selectedPlacePosition: Int = -1
+
+    private fun openSearchPlaceFragment() {
+        val searchPlaceFragment = SearchPlaceFragment().apply {
+            onPlaceSelected = { place ->
+                handlePlaceSelected(place)
+            }
+        }
+        Log.d("openSearchPlaceFragment", "화면 전환")
+        requireActivity().supportFragmentManager.beginTransaction()
+            .replace(R.id.InputContainer, searchPlaceFragment) // 적절한 컨테이너 ID 사용
+            .addToBackStack(null)
+            .commit()
+    }
+
+    private fun handlePlaceSelected(place: Place) {
+        if (selectedPlacePosition >= 0 && selectedPlacePosition < dayActivities.size) {
+            // 선택된 위치에 장소 변경
+            dayActivities[selectedPlacePosition] = place
+        } else {
+            // 장소 추가
+            dayActivities.add(place)
+        }
+        // RecyclerView 업데이트
+        Log.d("dayActivities", "$dayActivities")
+        view?.findViewById<RecyclerView>(R.id.dayRecyclerView)?.adapter?.notifyDataSetChanged()
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        // 장소 추가 버튼 로직
+        onAddPlaceClicked = {
+            selectedPlacePosition = -1 // 추가 모드
+            openSearchPlaceFragment()
+        }
+    }
 
     companion object {
         private const val ARG_DAY_ACTIVITIES = "day_activities"
+//        fun newInstance(dayActivities: MutableList<Place>, onAddPlaceClicked: () -> Unit): MyTripDayFragment =
+//            MyTripDayFragment().apply {
+//                this.onAddPlaceClicked = onAddPlaceClicked
+//                // ... 기존 코드 ...
+//                arguments = Bundle().apply {
+//                    putParcelableArrayList(ARG_DAY_ACTIVITIES, ArrayList(dayActivities))
+//                }
+//            }
 
-        fun newInstance(dayActivities: MutableList<Place>): MyTripDayFragment =
+        fun newInstance(dayActivities: MutableList<Place>, ): MyTripDayFragment =
             MyTripDayFragment().apply {
+                this.onAddPlaceClicked = onAddPlaceClicked
+                // ... 기존 코드 ...
                 arguments = Bundle().apply {
                     putParcelableArrayList(ARG_DAY_ACTIVITIES, ArrayList(dayActivities))
                 }
             }
+
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -135,9 +192,20 @@ class MyTripDayFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_input_day, container, false)
         val recyclerView = view.findViewById<RecyclerView>(R.id.dayRecyclerView)
         recyclerView.layoutManager = LinearLayoutManager(context)
-        recyclerView.adapter = MyTripDayAdapter(dayActivities, selectedPosition) { position ->
-            // 클릭된 항목 처리 로직
+        val adapter = MyTripDayAdapter(dayActivities, selectedPosition) { position ->
+            if (position == dayActivities.size) {
+                Log.d("MyTripDayAdapter", "$position")
+//                onAddPlaceClicked?.invoke()
+                selectedPlacePosition = -1 // 추가 모드
+                openSearchPlaceFragment()
+            } else {
+                // 기존 항목 클릭 로직
+                Log.d("MyTripDayAdapter", "$position")
+                selectedPlacePosition = position // 선택된 장소의 위치를 기록
+                openSearchPlaceFragment()
+            }
         }
+        recyclerView.adapter = adapter
 
         return view
     }

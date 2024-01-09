@@ -77,6 +77,13 @@ class InputFragment : Fragment(), OnMapReadyCallback {
     private lateinit var naverMap: NaverMap
     private lateinit var toolbar: Toolbar
     private lateinit var daysContainer: LinearLayout
+    private var selectedPosition: Int = 0
+
+    interface OnPlaceSelectedListener {
+        fun onPlaceSelected(place: Place)
+    }
+
+    var onPlaceSelectedListener: OnPlaceSelectedListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -131,6 +138,7 @@ class InputFragment : Fragment(), OnMapReadyCallback {
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
+                selectedPosition = position
                 updateMarkersForPosition(position)
             }
         })
@@ -142,46 +150,17 @@ class InputFragment : Fragment(), OnMapReadyCallback {
 
     private fun updateMarkersForPosition(position: Int) {
         if (isMapInitialized()) {
+            Log.d("updateMarkersForPosition", "$mytrip")
             mytrip?.let { currentMyTrip ->
                 if (position < currentMyTrip.places.size) {
                     val dayActivities = currentMyTrip.places[position]
+                    Log.d("updateMarkersForPosition", "$dayActivities")
                     clearMarkers() // 이전 마커들을 모두 제거
                     addMarkersToMap(dayActivities) // 선택된 위치에 대한 마커들 추가
                 }
             }
         }
     }
-//    private fun fetchMyTrips() {
-//        val client = OkHttpClient()
-//        val serverIp = getString(R.string.server_ip)
-//        val url = "$serverIp/get_mytrips_all"
-//        val request = Request.Builder().url(url).build()
-//
-//        client.newCall(request).enqueue(object : okhttp3.Callback {
-//            override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
-//                if (response.isSuccessful) {
-//                    val responseBody = response.body?.string()
-//                    Log.d("TripFragment", "Response from server: $responseBody")
-//
-//                    val mytripListType = object : TypeToken<List<MyTrip>>() {}.type
-//                    val mytrips = Gson().fromJson<List<MyTrip>>(responseBody, mytripListType)
-//
-//                    if (mytrips.isNotEmpty()) {
-//                        activity?.runOnUiThread {
-//                            mytrip = mytrips[0]
-//                            initializeUI()
-//                        }
-//                    }
-//                } else {
-//                    Log.e("TripFragment", "Response not successful")
-//                }
-//            }
-//
-//            override fun onFailure(call: okhttp3.Call, e: IOException) {
-//                Log.e("TripFragment", "Error fetching trips", e)
-//            }
-//        })
-//    }
     private fun fetchMyTrips(phoneNumber: String) {
         val client = OkHttpClient()
         val serverIp = getString(R.string.server_ip)
@@ -247,26 +226,6 @@ class InputFragment : Fragment(), OnMapReadyCallback {
             }
         }
     }
-//    private fun addDayEntries() {
-//        // Suppose you have a list of days or some data structure holding days data
-//        daysContainer.removeAllViews()
-//        val daysList = getDaysList() // Implement this method to get your days data
-//
-//        for (day in daysList) {
-//            val dayView = LayoutInflater.from(context).inflate(R.layout.item_day_entry, daysContainer, false)
-//
-//            // Set up the dayView, for example, set the text of TextViews, setup click listeners, etc.
-//            dayView.findViewById<TextView>(R.id.textViewDay).text = day
-//
-//            // Add to the container
-//            daysContainer.addView(dayView)
-//        }
-//    }
-//    private fun getDaysList(): List<String> {
-//        // This is just an example, replace with actual logic to retrieve days
-//        return listOf("1.22/화", "1.23/수")
-//            // Add more days as needed
-//    }
 
     private fun setupToolbar() {
         toolbar.title = "여행 일정" // Set toolbar title here
@@ -293,37 +252,6 @@ class InputFragment : Fragment(), OnMapReadyCallback {
             }
         }
 
-    }
-
-    private fun setupMapInteractions() {
-        naverMap.setOnMapClickListener { _, latLng ->
-            addMarkerAndPlaceToMyTrip(latLng)
-        }
-    }
-
-    private fun addMarkerAndPlaceToMyTrip(latLng: LatLng) {
-        // Create a marker and add to map
-        val marker = Marker().apply {
-            position = latLng
-            map = naverMap
-        }
-
-        // Create a Place object and add to trip
-        val place = Place(
-            name = "해운대 해수욕장",
-            city = "부산",
-            type = "해변",
-            mapx = 129.1586f,
-            mapy = 35.1587f,
-            address = "해운대구, 부산",
-            visited = 0,
-            tag = listOf("해변", "관광", "자연"),
-            img = R.drawable.img_hud
-        )
-
-        mytrip?.places?.add(mutableListOf(place))
-
-        Toast.makeText(context, "Added: ${place.name}", Toast.LENGTH_SHORT).show()
     }
     private inner class MyTripViewPagerAdapter(fa: FragmentActivity, private val mytrip: MyTrip) : FragmentStateAdapter(fa) {
         override fun getItemCount(): Int = mytrip.places.size

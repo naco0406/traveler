@@ -12,7 +12,7 @@ data class Place (
     val address : String,
     val visited : Int,
     val tag : List<String>,
-    val img : Int
+    val img : String
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readString() ?: "",
@@ -23,7 +23,7 @@ data class Place (
         parcel.readString() ?: "",
         parcel.readInt(),
         parcel.createStringArrayList() ?: listOf(),
-        parcel.readInt()
+        parcel.readString() ?: ""
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
@@ -35,7 +35,7 @@ data class Place (
         parcel.writeString(address)
         parcel.writeInt(visited)
         parcel.writeStringList(tag)
-        parcel.writeInt(img)
+        parcel.writeString(img)
     }
 
     override fun describeContents(): Int {

@@ -2,6 +2,7 @@
 package com.example.traveler
 
 import OuterRouteAdapter
+import TripFragment
 import android.content.ContentValues
 import android.content.ContentValues.TAG
 import android.os.Bundle
@@ -49,10 +50,6 @@ class SearchTrip : Fragment() {
             }
         })
 
-
-
-
-
     // Create OuterRouteAdapter
         outerRouteAdapter = OuterRouteAdapter(requireContext(), outerRouteList)
 
@@ -87,6 +84,27 @@ class SearchTrip : Fragment() {
         })
 
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        outerRouteAdapter.onItemClickListener = { trip ->
+            startTripFragment(trip)
+        }
+    }
+
+    private fun startTripFragment(trip: Trip) {
+        val fragment = TripFragment().apply {
+            arguments = Bundle().apply {
+                putString("tripJson", Gson().toJson(trip))
+            }
+        }
+
+        requireActivity().supportFragmentManager.beginTransaction()
+            .replace(R.id.SearchTripContainer, fragment)
+            .addToBackStack(null)
+            .commit()
     }
 
     private fun filterItems(query: String) {

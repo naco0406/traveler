@@ -98,47 +98,51 @@ class TripFragment : Fragment(), OnMapReadyCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        fetchTrips()
+//        fetchTrips()
+//
+//        val client = OkHttpClient()
+//        val serverIp = getString(R.string.server_ip)
+//        val url = "$serverIp/get_trips"
+//        val request = Request.Builder()
+//            .url(url)
+//            .build()
 
-        val client = OkHttpClient()
-        val serverIp = getString(R.string.server_ip)
-        val url = "$serverIp/get_trips"
-        val request = Request.Builder()
-            .url(url)
-            .build()
+        arguments?.getString("tripJson")?.let {
+            trip = Gson().fromJson(it, Trip::class.java)
+        }
 
     }
-    private fun fetchTrips() {
-        val client = OkHttpClient()
-        val serverIp = getString(R.string.server_ip)
-        val url = "$serverIp/get_trips"
-        val request = Request.Builder().url(url).build()
-
-        client.newCall(request).enqueue(object : okhttp3.Callback {
-            override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
-                if (response.isSuccessful) {
-                    val responseBody = response.body?.string()
-                    Log.d("TripFragment", "Response from server: $responseBody")
-
-                    val tripListType = object : TypeToken<List<Trip>>() {}.type
-                    val trips = Gson().fromJson<List<Trip>>(responseBody, tripListType)
-
-                    if (trips.isNotEmpty()) {
-                        activity?.runOnUiThread {
-                            trip = trips[0]
-                            initializeUI()
-                        }
-                    }
-                } else {
-                    Log.e("TripFragment", "Response not successful")
-                }
-            }
-
-            override fun onFailure(call: okhttp3.Call, e: IOException) {
-                Log.e("TripFragment", "Error fetching trips", e)
-            }
-        })
-    }
+//    private fun fetchTrips() {
+//        val client = OkHttpClient()
+//        val serverIp = getString(R.string.server_ip)
+//        val url = "$serverIp/get_trips"
+//        val request = Request.Builder().url(url).build()
+//
+//        client.newCall(request).enqueue(object : okhttp3.Callback {
+//            override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
+//                if (response.isSuccessful) {
+//                    val responseBody = response.body?.string()
+//                    Log.d("TripFragment", "Response from server: $responseBody")
+//
+//                    val tripListType = object : TypeToken<List<Trip>>() {}.type
+//                    val trips = Gson().fromJson<List<Trip>>(responseBody, tripListType)
+//
+//                    if (trips.isNotEmpty()) {
+//                        activity?.runOnUiThread {
+//                            trip = trips[0]
+//                            initializeUI()
+//                        }
+//                    }
+//                } else {
+//                    Log.e("TripFragment", "Response not successful")
+//                }
+//            }
+//
+//            override fun onFailure(call: okhttp3.Call, e: IOException) {
+//                Log.e("TripFragment", "Error fetching trips", e)
+//            }
+//        })
+//    }
     private fun initializeUI() {
         trip?.let { currentTrip ->
             viewPager.adapter = TripViewPagerAdapter(requireActivity(), currentTrip)
@@ -158,10 +162,11 @@ class TripFragment : Fragment(), OnMapReadyCallback {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_trip, container, false)
+
         viewPager = view.findViewById(R.id.viewPager)
         tabs = view.findViewById(R.id.tabs)
 
-        // ViewPager2와 TabLayout 설정
+        // ViewPager2와 TabLayout 설정을 이곳으로 이동
         trip?.let { currentTrip ->
             viewPager.adapter = TripViewPagerAdapter(requireActivity(), currentTrip)
             TabLayoutMediator(tabs, viewPager) { tab, position ->
@@ -188,6 +193,7 @@ class TripFragment : Fragment(), OnMapReadyCallback {
                 updateMarkersForPosition(position)
             }
         })
+        initializeUI()
     }
 
     private fun isMapInitialized(): Boolean {

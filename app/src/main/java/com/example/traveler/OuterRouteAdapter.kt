@@ -29,8 +29,13 @@ class OuterRouteAdapter(private val context: Context, private var OuterRouteList
         return ViewHolder(itemView)
     }
 
+    var onItemClickListener: ((Trip) -> Unit)? = null
+
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val route = OuterRouteList[position]
+        holder.itemView.setOnClickListener {
+            onItemClickListener?.invoke(route)
+        }
         holder.bind(route)
     }
 
