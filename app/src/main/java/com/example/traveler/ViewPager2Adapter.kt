@@ -12,7 +12,7 @@ class ViewPager2Adapter(fragmentActivity: FragmentActivity) : FragmentStateAdapt
     private val fragmentList: MutableList<Fragment> = mutableListOf(FirstFragment(),SecondFragment(),ThirdFragment(),MapFragment())
     private val itemCount = fragmentList.size
     override fun getItemCount(): Int {
-        return 6
+        return 7
     }
 
     override fun createFragment(position: Int): Fragment {
@@ -23,6 +23,7 @@ class ViewPager2Adapter(fragmentActivity: FragmentActivity) : FragmentStateAdapt
             3 -> MapFragment()
             4 -> TripFragment()
             5 -> InputFragment()
+            6 -> SearchPlaceFragment()
             else -> throw IndexOutOfBoundsException("Invalid fragment position")
         }
     }
