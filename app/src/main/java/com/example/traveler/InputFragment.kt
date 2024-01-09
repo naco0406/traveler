@@ -32,8 +32,11 @@ import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
+import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.RequestBody
 import java.io.IOException
 import java.util.Date
 
@@ -78,11 +81,11 @@ class InputFragment : Fragment(), OnMapReadyCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        fetchMyTrips()
+        fetchMyTrips("010-5678-9012")
 
         val client = OkHttpClient()
         val serverIp = getString(R.string.server_ip)
-        val url = "$serverIp/get_mytrips"
+        val url = "$serverIp/get_mytrips_all"
         val request = Request.Builder()
             .url(url)
             .build()
@@ -148,17 +151,58 @@ class InputFragment : Fragment(), OnMapReadyCallback {
             }
         }
     }
-    private fun fetchMyTrips() {
+//    private fun fetchMyTrips() {
+//        val client = OkHttpClient()
+//        val serverIp = getString(R.string.server_ip)
+//        val url = "$serverIp/get_mytrips_all"
+//        val request = Request.Builder().url(url).build()
+//
+//        client.newCall(request).enqueue(object : okhttp3.Callback {
+//            override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
+//                if (response.isSuccessful) {
+//                    val responseBody = response.body?.string()
+//                    Log.d("TripFragment", "Response from server: $responseBody")
+//
+//                    val mytripListType = object : TypeToken<List<MyTrip>>() {}.type
+//                    val mytrips = Gson().fromJson<List<MyTrip>>(responseBody, mytripListType)
+//
+//                    if (mytrips.isNotEmpty()) {
+//                        activity?.runOnUiThread {
+//                            mytrip = mytrips[0]
+//                            initializeUI()
+//                        }
+//                    }
+//                } else {
+//                    Log.e("TripFragment", "Response not successful")
+//                }
+//            }
+//
+//            override fun onFailure(call: okhttp3.Call, e: IOException) {
+//                Log.e("TripFragment", "Error fetching trips", e)
+//            }
+//        })
+//    }
+    private fun fetchMyTrips(phoneNumber: String) {
         val client = OkHttpClient()
         val serverIp = getString(R.string.server_ip)
-        val url = "$serverIp/get_mytrips"
-        val request = Request.Builder().url(url).build()
+        val url = "$serverIp/get_user_mytrips"
 
+        // Create the JSON payload with the user's phone number
+        val json = "application/json; charset=utf-8".toMediaTypeOrNull()
+        val requestBody = RequestBody.create(json, "{\"phone\":\"$phoneNumber\"}")
+
+        // Build the request as a POST
+        val request = Request.Builder()
+            .url(url)
+            .post(requestBody)
+            .build()
+
+        // Make the asynchronous POST request
         client.newCall(request).enqueue(object : okhttp3.Callback {
             override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
                 if (response.isSuccessful) {
                     val responseBody = response.body?.string()
-                    Log.d("TripFragment", "Response from server: $responseBody")
+                    Log.d("TripFragmentInput", "Response from server: $responseBody")
 
                     val mytripListType = object : TypeToken<List<MyTrip>>() {}.type
                     val mytrips = Gson().fromJson<List<MyTrip>>(responseBody, mytripListType)
@@ -169,16 +213,28 @@ class InputFragment : Fragment(), OnMapReadyCallback {
                             initializeUI()
                         }
                     }
+                    activity?.runOnUiThread {
+                        // Update the UI with the list of trips
+                        // This assumes you have a RecyclerView or other UI elements to display the trips
+                        updateUIWithTrips(mytrips)
+                    }
                 } else {
-                    Log.e("TripFragment", "Response not successful")
+                    Log.e("TripFragmentInput", "Response not successful: ${response.message}")
                 }
             }
 
             override fun onFailure(call: okhttp3.Call, e: IOException) {
-                Log.e("TripFragment", "Error fetching trips", e)
+                Log.e("TripFragmentInput", "Error fetching trips", e)
             }
         })
     }
+
+    private fun updateUIWithTrips(mytrips: List<MyTrip>) {
+//         TODO: Implement the UI update logic
+        // For example, updating a RecyclerView adapter:
+//         myTripsAdapter.updateData(mytrips)
+    }
+
     private fun initializeUI() {
         mytrip?.let { currentMyTrip ->
             viewPager.adapter = MyTripViewPagerAdapter(requireActivity(), currentMyTrip)
