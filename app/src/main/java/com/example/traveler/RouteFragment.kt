@@ -3,14 +3,16 @@ package com.example.traveler
 
 import OuterRouteAdapter
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ToggleButton
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
-class RouteFragment(private val routeData: Trip) : Fragment() {
+class RouteFragment(private var routeData: Trip) : Fragment() {
 
     private lateinit var RouteAdapter: RouteAdapter
 
@@ -19,6 +21,7 @@ class RouteFragment(private val routeData: Trip) : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.inner_route_item, container, false)
+        val likeButton = view.findViewById<ToggleButton>(R.id.likeButton)
 
         // Sample data for OuterRouteAdapter
         // Create OuterRouteAdapter
@@ -29,6 +32,24 @@ class RouteFragment(private val routeData: Trip) : Fragment() {
         val innerRecyclerView: RecyclerView = view.findViewById(R.id.inner_recyclerView)
         innerRecyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         innerRecyclerView.adapter = RouteAdapter
+
+        likeButton.setOnCheckedChangeListener { buttonView, isChecked ->
+            Log.d("Checking", "isChecked: $isChecked, selected value: $routeData.selected")
+
+            if (isChecked) {
+                routeData.selected += 1
+                Log.d("Checking", "selected value: $routeData.selected")
+            }
+            else {
+                if (routeData.selected > 0) {
+                    routeData.selected -= 1
+                    Log.d("Checking", "selected value: $routeData.selected")
+                }
+
+            }
+
+
+        }
 
         return view
     }

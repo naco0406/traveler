@@ -1,12 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="100dp">
+    android:layout_height="100dp"
+    android:orientation="horizontal">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/inner_recyclerView"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
+        android:layout_weight="10"
         android:layout_height="match_parent"
-        android:background="#E3D2DD"
-        android:orientation="horizontal"/>
+        android:background="@drawable/rectangle_route_item"
+        android:layout_margin="5dp"/>
+    <ToggleButton
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:id="@+id/likeButton"
+        android:background="@drawable/favorite_button_selector"
+        android:layout_gravity="center_vertical"
+        android:drawableTint="@color/black"
+        android:textOff=""
+        android:textOn=""/>
 </LinearLayout>

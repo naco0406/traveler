@@ -5,6 +5,6 @@ data class Trip (
     val city: String,
     val period: Int,
     val places: List<List<Place>>,
-    val selected: Int,
-    val review: List<String>,
+    var selected: Int,
+    var review: List<String>,
 )
