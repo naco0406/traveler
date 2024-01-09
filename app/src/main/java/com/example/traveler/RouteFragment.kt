@@ -33,24 +33,9 @@ class RouteFragment(private var routeData: Trip) : Fragment() {
         innerRecyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         innerRecyclerView.adapter = RouteAdapter
 
-        likeButton.setOnCheckedChangeListener { buttonView, isChecked ->
-            Log.d("Checking", "isChecked: $isChecked, selected value: $routeData.selected")
-
-            if (isChecked) {
-                routeData.selected += 1
-                Log.d("Checking", "selected value: $routeData.selected")
-            }
-            else {
-                if (routeData.selected > 0) {
-                    routeData.selected -= 1
-                    Log.d("Checking", "selected value: $routeData.selected")
-                }
-
-            }
-
-
-        }
 
         return view
     }
+
+
 }

@@ -54,7 +54,7 @@ class SearchTrip : Fragment() {
 
 
     // Create OuterRouteAdapter
-        outerRouteAdapter = OuterRouteAdapter(outerRouteList)
+        outerRouteAdapter = OuterRouteAdapter(requireContext(), outerRouteList)
 
         // Set up RecyclerView
         val outerRecyclerView: RecyclerView = view.findViewById(R.id.outer_recyclerView)
