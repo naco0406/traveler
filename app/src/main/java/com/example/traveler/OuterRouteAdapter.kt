@@ -1,3 +1,4 @@
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -37,6 +38,8 @@ class OuterRouteAdapter(private var OuterRouteList: List<Trip>):RecyclerView.Ada
 
     fun updateData(newItemList: List<Trip>) {
         OuterRouteList = newItemList
+        val OuterRouteList_size = OuterRouteList.size
+        Log.d("Filter","updated list size: $OuterRouteList_size, updated list: $OuterRouteList,")
         notifyDataSetChanged()
     }
 }
