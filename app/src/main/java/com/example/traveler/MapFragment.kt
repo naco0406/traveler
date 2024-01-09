@@ -128,8 +128,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             val area1 = region.getJSONObject("area1").getString("name") // 시/도
             val area2 = region.getJSONObject("area2").getString("name") // 구/군
             val area3 = region.getJSONObject("area3").getString("name") // 동/면/읍
-            Log.d("parseAddressFromJson", "onResponse: $area1 $area2 $area3")
-            return "$area1 $area2 $area3"
+            val area4 = region.getJSONObject("area4").getString("name") // 상세 주소
+            Log.d("parseAddressFromJson", "onResponse: $area1 $area2 $area3 $area4")
+            return "$area1 $area2 $area3 $area4"
         }
         return ""
     }
