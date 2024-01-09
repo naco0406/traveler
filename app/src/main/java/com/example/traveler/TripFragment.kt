@@ -1,4 +1,5 @@
 // TripFragment.kt
+import android.content.ContentValues.TAG
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -146,7 +147,8 @@ class TripFragment : Fragment(), OnMapReadyCallback {
                     if (trips.isNotEmpty()) {
                         activity?.runOnUiThread {
                             trip = trips[0]
-                            initializeUI()
+                            Log.e(TAG,"$trip")
+                            //initializeUI()
                         }
                     }
                 } else {
