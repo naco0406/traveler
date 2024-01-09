@@ -1,4 +1,3 @@
-
 package com.example.traveler
 
 import android.os.Bundle
@@ -25,10 +24,14 @@ import okhttp3.Response
 import java.io.IOException
 
 class PlaceSearchAdapter(private var places: List<Place>) : RecyclerView.Adapter<PlaceSearchAdapter.PlaceViewHolder>() {
-
+    private var itemClickListener: ((Place) -> Unit)? = null
     class PlaceViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val textViewName: TextView = view.findViewById(R.id.textViewName)
         // Add other views you might have
+    }
+
+    fun setOnItemClickListener(listener: (Place) -> Unit) {
+        itemClickListener = listener
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlaceViewHolder {
@@ -39,7 +42,7 @@ class PlaceSearchAdapter(private var places: List<Place>) : RecyclerView.Adapter
     override fun onBindViewHolder(holder: PlaceViewHolder, position: Int) {
         val place = places[position]
         holder.textViewName.text = place.name
-        // Bind other data to views
+        holder.itemView.setOnClickListener { itemClickListener?.invoke(place) }
     }
 
     override fun getItemCount() = places.size
@@ -55,6 +58,7 @@ class SearchPlaceFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var editTextSearch: EditText
     private var placeList = mutableListOf<Place>()
+    var onPlaceSelected: ((Place) -> Unit)? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -70,6 +74,15 @@ class SearchPlaceFragment : Fragment() {
         fetchPlaces()  // Implement this method to fetch places from your server or local database
 
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        placeSearchAdapter.setOnItemClickListener { place ->
+            onPlaceSelected?.invoke(place)
+            requireActivity().supportFragmentManager.popBackStack() // 현재 프래그먼트 종료
+        }
+
     }
 
     private fun setupSearchBar() {
