@@ -36,6 +36,17 @@ class TripDayAdapter(private val dayActivities: List<Place>, private var selecte
             onItemClicked(position) // 외부에서 처리할 추가적인 작업
         }
 
+        // Inside onBindViewHolder method of TripDayAdapter
+        val number = position + 1 // Assuming the first position is 1
+        holder.numberIndicator.text = number.toString()
+
+        // If there is travel time data available for the current position, display it
+//        val travelTime = dayActivities[position].travelTime // Add travelTime to your Place model if necessary
+        val travelTime = "10"
+//        holder.travelTime.text = travelTime
+//        holder.travelTime.visibility = View.VISIBLE
+
+
         // 선택된 항목에 대한 로직
         if (position == selectedPosition) {
             // 카드 포커스 및 인디케이터 색상 변경
@@ -54,6 +65,8 @@ class TripDayAdapter(private val dayActivities: List<Place>, private var selecte
         val textView: TextView = view.findViewById(R.id.textView)
         val cardView: CardView = view.findViewById(R.id.cardView)
         val currentIndicatorCircle: View = view.findViewById(R.id.currentIndicatorCircle)
+        val numberIndicator: TextView = view.findViewById(R.id.numberIndicator)
+//        val travelTime: TextView = view.findViewById(R.id.travelTime)
     }
 }
 

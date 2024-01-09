@@ -62,6 +62,14 @@ public class MainActivity : AppCompatActivity() {
                     tabIcon.setImageResource(R.drawable.round_map_24)
                     tabIcon.setColorFilter(ContextCompat.getColor(this, R.color.black))
                 }
+                4 -> {
+                    tabIcon.setImageResource(R.drawable.round_favorite_24)
+                    tabIcon.setColorFilter(ContextCompat.getColor(this, R.color.black))
+                }
+                5 -> {
+                    tabIcon.setImageResource(R.drawable.round_favorite_24)
+                    tabIcon.setColorFilter(ContextCompat.getColor(this, R.color.black))
+                }
             }
             // 탭에 커스텀 뷰를 설정
             tab.customView = tabView

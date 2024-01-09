@@ -1,6 +1,7 @@
 package com.example.traveler
 
 import TripFragment
+import android.renderscript.ScriptGroup.Input
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -11,7 +12,7 @@ class ViewPager2Adapter(fragmentActivity: FragmentActivity) : FragmentStateAdapt
     private val fragmentList: MutableList<Fragment> = mutableListOf(FirstFragment(),SecondFragment(),ThirdFragment(),MapFragment())
     private val itemCount = fragmentList.size
     override fun getItemCount(): Int {
-        return 5
+        return 6
     }
 
     override fun createFragment(position: Int): Fragment {
@@ -21,6 +22,7 @@ class ViewPager2Adapter(fragmentActivity: FragmentActivity) : FragmentStateAdapt
             2 -> ThirdFragment()
             3 -> MapFragment()
             4 -> TripFragment()
+            5 -> InputFragment()
             else -> throw IndexOutOfBoundsException("Invalid fragment position")
         }
     }
