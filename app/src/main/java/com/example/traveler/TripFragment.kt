@@ -255,6 +255,16 @@ class TripFragment : Fragment(), OnMapReadyCallback {
             3 -> R.drawable.marker_3
             4 -> R.drawable.marker_4
             5 -> R.drawable.marker_5
+            6 -> R.drawable.marker_6
+            7 -> R.drawable.marker_7
+            8 -> R.drawable.marker_8
+            9 -> R.drawable.marker_9
+            10 -> R.drawable.marker_10
+            11 -> R.drawable.marker_11
+            12 -> R.drawable.marker_12
+            13 -> R.drawable.marker_13
+            14 -> R.drawable.marker_14
+            15 -> R.drawable.marker_15
             else -> R.drawable.round_location_on_24
         }
     }
