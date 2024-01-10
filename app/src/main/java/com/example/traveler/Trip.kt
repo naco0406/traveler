@@ -7,4 +7,5 @@ data class Trip (
     val places: List<List<Place>>,
     var selected: Int,
     var review: List<String>,
+    val numPeople: Int,
 )
