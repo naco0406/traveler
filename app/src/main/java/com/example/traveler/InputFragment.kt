@@ -77,13 +77,6 @@ class InputFragment : Fragment(), OnMapReadyCallback {
     private lateinit var naverMap: NaverMap
     private lateinit var toolbar: Toolbar
     private lateinit var daysContainer: LinearLayout
-    private var selectedPosition: Int = 0
-
-    interface OnPlaceSelectedListener {
-        fun onPlaceSelected(place: Place)
-    }
-
-    var onPlaceSelectedListener: OnPlaceSelectedListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -126,6 +119,12 @@ class InputFragment : Fragment(), OnMapReadyCallback {
         return view
     }
 
+    private fun handlePlaceSelected(place: Place) {
+        // 여기에 장소를 처리하는 로직을 추가합니다.
+        // 예를 들면, mytrip.places에 장소 추가 또는 변경 등
+        Log.d("handlePlaceSelected", "$place")
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -138,10 +137,16 @@ class InputFragment : Fragment(), OnMapReadyCallback {
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
-                selectedPosition = position
                 updateMarkersForPosition(position)
             }
         })
+
+        val searchPlaceFragment = SearchPlaceFragment().apply {
+            onPlaceSelected = { place ->
+                handlePlaceSelected(place)
+            }
+        }
+
         setupToolbar()
     }
     private fun isMapInitialized(): Boolean {
@@ -150,17 +155,16 @@ class InputFragment : Fragment(), OnMapReadyCallback {
 
     private fun updateMarkersForPosition(position: Int) {
         if (isMapInitialized()) {
-            Log.d("updateMarkersForPosition", "$mytrip")
             mytrip?.let { currentMyTrip ->
                 if (position < currentMyTrip.places.size) {
                     val dayActivities = currentMyTrip.places[position]
-                    Log.d("updateMarkersForPosition", "$dayActivities")
                     clearMarkers() // 이전 마커들을 모두 제거
                     addMarkersToMap(dayActivities) // 선택된 위치에 대한 마커들 추가
                 }
             }
         }
     }
+
     private fun fetchMyTrips(phoneNumber: String) {
         val client = OkHttpClient()
         val serverIp = getString(R.string.server_ip)
@@ -253,13 +257,51 @@ class InputFragment : Fragment(), OnMapReadyCallback {
         }
 
     }
+    private fun openSearchPlaceFragment() {
+        val searchPlaceFragment = SearchPlaceFragment()
+        requireActivity().supportFragmentManager.beginTransaction()
+            .replace(R.id.InputContainer, searchPlaceFragment) // 'container'는 호스트 액티비티의 FragmentContainerView ID
+            .addToBackStack(null)
+            .commit()
+    }
+
+//    private fun setupMapInteractions() {
+//        naverMap.setOnMapClickListener { _, latLng ->
+//            addMarkerAndPlaceToMyTrip(latLng)
+//        }
+//    }
+//
+//    private fun addMarkerAndPlaceToMyTrip(latLng: LatLng) {
+//        // Create a marker and add to map
+//        val marker = Marker().apply {
+//            position = latLng
+//            map = naverMap
+//        }
+//
+//        // Create a Place object and add to trip
+//        val place = Place(
+//            name = "해운대 해수욕장",
+//            city = "부산",
+//            type = "해변",
+//            mapx = 129.1586f,
+//            mapy = 35.1587f,
+//            address = "해운대구, 부산",
+//            visited = 0,
+//            tag = listOf("해변", "관광", "자연"),
+//            img = R.drawable.img_hud
+//        )
+//
+//        mytrip?.places?.add(mutableListOf(place))
+//
+//        Toast.makeText(context, "Added: ${place.name}", Toast.LENGTH_SHORT).show()
+//    }
     private inner class MyTripViewPagerAdapter(fa: FragmentActivity, private val mytrip: MyTrip) : FragmentStateAdapter(fa) {
         override fun getItemCount(): Int = mytrip.places.size
 
         override fun createFragment(position: Int): Fragment {
             // 각 포지션에 맞는 TripDayFragment 생성
             val dayActivities = mytrip.places[position]
-            return MyTripDayFragment.newInstance(dayActivities)
+            return MyTripDayFragment.newInstance(dayActivities, ::openSearchPlaceFragment)
         }
     }
 
