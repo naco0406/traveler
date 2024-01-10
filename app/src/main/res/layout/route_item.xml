@@ -9,12 +9,15 @@
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/baseline_brightness_1_24"
+        android:src="@drawable/baseline_brightness_1_12"
         android:layout_gravity="center"/>
+
     <TextView
         android:id="@+id/place_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textSize="12dp"
         android:text="Place1"/>
 
 </LinearLayout>

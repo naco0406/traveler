@@ -52,6 +52,7 @@ class MyPageFragment : Fragment() {
         val button_myphone = view.findViewById<ImageButton>(R.id.button_myphoneNum)
         val button_mynickname = view.findViewById<ImageButton>(R.id.button_mynickname)
         val button_logout = view.findViewById<Button>(R.id.button_logout)
+        val nameText = view.findViewById<TextView>(R.id.nameText)
 
 
         val fileName = "Mypage.json"
@@ -62,6 +63,8 @@ class MyPageFragment : Fragment() {
             val content = file.readText()
             Log.e(TAG, "저장되어 있던 my data 불러오기: $content")
             val myData = JSONObject(content)
+            val userName = myData.getString("name")
+            nameText.text = userName + "님"
             myname.text = myData.getString("name")
             myphone.text = myData.getString("phone")
             mynickname.text = myData.getString("nickname")

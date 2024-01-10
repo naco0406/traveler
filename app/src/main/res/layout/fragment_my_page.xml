@@ -5,38 +5,65 @@
     android:layout_height="match_parent"
     tools:context=".MyPageFragment"
     android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@color/white"
     android:id="@+id/myPage">
 
     <!-- TODO: Update blank fragment layout -->
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:text = "My Page"
-            android:textSize="30dp"
-            android:gravity="center"/>
+        android:layout_height="wrap_content"
+        android:gravity="end">
 
         <Button
             android:id="@+id/button_logout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="logout"
+            android:text="로그아웃"
+            android:backgroundTint="@color/select"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"/>
-    </RelativeLayout>
+    </LinearLayout>
 
-
-    <ImageView
-        android:id="@+id/profileImage"
-        android:layout_width="200dp"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:src="@drawable/profile_img"
-        android:scaleType="centerCrop"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="16dp"/>
+        android:layout_marginTop="50dp"
+        android:layout_gravity="center_vertical"
+        android:gravity="center"
+        android:orientation="horizontal">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="start|center_vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="30dp"
+                android:id="@+id/nameText"
+                android:text="양혜민님"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="24dp"
+                android:text="안녕하세요"/>
+        </LinearLayout>
+        <Space
+            android:layout_width="70dp"
+            android:layout_height="0dp"/>
+        <ImageView
+            android:id="@+id/profileImage"
+            android:layout_width="125dp"
+            android:layout_height="125dp"
+            android:gravity="end"
+            android:src="@drawable/choonsik"
+            android:scaleType="centerCrop"/>
+    </LinearLayout>
+
+    <Space
+        android:layout_width="0dp"
+        android:layout_height="100dp"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -47,8 +74,10 @@
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_weight="3"
-            android:gravity="center_vertical|center"
-            android:text="Name"/>
+            android:gravity="center_vertical|end"
+            android:layout_marginRight="16dp"
+            android:textSize="16dp"
+            android:text="이름"/>
 
 
         <RelativeLayout
@@ -61,7 +90,8 @@
                 android:id="@+id/myName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Yang Hyemin"
+                android:text="양혜민"
+                android:textSize="16dp"
                 android:gravity="center_vertical|center"
                 android:layout_centerInParent="true"
                 android:visibility="visible"
@@ -72,7 +102,8 @@
                 android:id="@+id/edit_myName"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:hint="Type here..."
+                android:hint="변경할 이름 입력"
+                android:textSize="16dp"
                 android:gravity="center_vertical|center"
                 android:layout_below="@id/myName"
                 android:layout_marginTop="-35dp"
@@ -99,8 +130,10 @@
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_weight="3"
-            android:gravity="center_vertical|center"
-            android:text="NickName"/>
+            android:gravity="center_vertical|end"
+            android:textSize="16dp"
+            android:layout_marginRight="16dp"
+            android:text="별명"/>
 
         <RelativeLayout
             android:layout_width="0dp"
@@ -112,18 +145,18 @@
                 android:id="@+id/myNickName"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="nickname"
-                android:gravity="center_vertical|center"
                 android:layout_centerInParent="true"
-                android:visibility="visible"
-                />
+                android:gravity="center_vertical|center"
+                android:text="별명"
+                android:textSize="16dp"
+                android:visibility="visible" />
 
             <!-- EditText를 추가하고, TextView와 겹쳐지도록 설정합니다 -->
             <EditText
                 android:id="@+id/edit_myNickName"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:hint="Type here..."
+                android:hint="변경할 별명 입력"
                 android:gravity="center_vertical|center"
                 android:layout_below="@id/myNickName"
                 android:layout_marginTop="-35dp"
@@ -149,8 +182,10 @@
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_weight="3"
-            android:gravity="center_vertical|center"
-            android:text="Phone Number"/>
+            android:gravity="center_vertical|end"
+            android:textSize="16dp"
+            android:layout_marginRight="16dp"
+            android:text="전화번호"/>
 
         <RelativeLayout
             android:layout_width="0dp"
@@ -162,7 +197,8 @@
                 android:id="@+id/myPhoneNum"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text=""
+                android:text="000-0000-0000"
+                android:textSize="16dp"
                 android:gravity="center_vertical|center"
                 android:layout_centerInParent="true"
                 android:visibility="visible"
@@ -173,7 +209,8 @@
                 android:id="@+id/edit_myPhoneNum"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:hint="Type here..."
+                android:hint="변경할 전화번호 입력"
+                android:textSize="16dp"
                 android:gravity="center_vertical|center"
                 android:layout_below="@id/myPhoneNum"
                 android:layout_marginTop="-35dp"
