@@ -14,6 +14,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -32,6 +33,12 @@ class SearchTrip : Fragment() {
     private var outerRouteList = mutableListOf<Trip>()
     private var fullRouteList = mutableListOf<Trip>()
     private lateinit var editTextSearch: EditText
+    private var trendyCityName: String? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        fetchTrips()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -42,7 +49,7 @@ class SearchTrip : Fragment() {
         val filteringButton = view.findViewById<ImageView>(R.id.filteringButton)
 
 
-        fetchTrips()
+        //fetchTrips()
 
         outerRouteListLiveData.observe(viewLifecycleOwner, Observer { trips ->
             if (trips.isNotEmpty()) {
@@ -60,12 +67,6 @@ class SearchTrip : Fragment() {
         outerRecyclerView.layoutManager = LinearLayoutManager(context)
         outerRecyclerView.adapter = outerRouteAdapter
 
-        //filtering을 위한 dialogFragment 생성
-
-        filteringButton.setOnClickListener {
-            openDialog()
-
-        }
 
 
 
@@ -93,7 +94,24 @@ class SearchTrip : Fragment() {
             }
         })
 
+        //filtering을 위한 dialogFragment 생성
+
+        filteringButton.setOnClickListener {
+            openDialog()
+
+        }
+
         return view
+    }
+
+    companion object {
+        fun newInstance(trendyCityName: String): SearchTrip {
+            val fragment = SearchTrip()
+            val args = Bundle()
+            args.putString("trendyCityName", trendyCityName)
+            fragment.arguments = args
+            return fragment
+        }
     }
 
     //Dialog에서 result 받아오는 function
@@ -105,6 +123,12 @@ class SearchTrip : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+
+        trendyCityName?.let { cityName ->
+            Log.d("Checking","cityname in SearchTrip: $cityName")
+            filterItems(cityName)
+        }
 
         outerRouteAdapter.onItemClickListener = { trip ->
             startTripFragment(trip)
@@ -121,6 +145,20 @@ class SearchTrip : Fragment() {
             filterItems2(numPeople,period)
 
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d("Checking","nullable check: $trendyCityName")
+        trendyCityName?.let { cityName ->
+            Log.d("Checking","cityname in SearchTrip: $cityName")
+            filterItems(cityName)
+        }
+    }
+
+    fun initializeWithTrendyCity(trendyCityName: String) {
+        this.trendyCityName = trendyCityName
+        // 다른 초기화 작업이 필요하다면 이곳에서 수행
     }
 
     private fun startTripFragment(trip: Trip) {
@@ -177,6 +215,7 @@ class SearchTrip : Fragment() {
         // Update the RecyclerView with the filtered data
         outerRouteAdapter.updateData(filteredList)
     }
+
 
     private fun filterItems(query: String) {
         val fullItemList = outerRouteList/* your original full list of items */

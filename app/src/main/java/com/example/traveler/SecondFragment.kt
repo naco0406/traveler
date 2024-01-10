@@ -20,7 +20,9 @@ import android.widget.Space
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.gson.Gson
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.OkHttpClient
@@ -30,12 +32,15 @@ import org.json.JSONArray
 import org.json.JSONException
 import java.io.IOException
 
-class SecondFragment : Fragment() {
+
+
+class SecondFragment : Fragment(), OnItemClickListener {
 
     private lateinit var cityAdapter: CityAdapter
     private lateinit var placeAdapter: PlaceAdapter
 
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<View>
+    private var trendy_city_name = ""
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -162,7 +167,8 @@ class SecondFragment : Fragment() {
 //        }
 
         val rv_city = view.findViewById<RecyclerView>(R.id.recyclerViewCity)
-        cityAdapter = CityAdapter(requireContext())
+
+        cityAdapter = CityAdapter(requireContext(), this )
 
         rv_city.adapter = cityAdapter
         context.let {
@@ -190,6 +196,32 @@ class SecondFragment : Fragment() {
                 placeAdapter.notifyDataSetChanged()
             }
         }
+
+    }
+
+    override fun onItemClick(trendy_city_name: String) {
+        // 해당 아이템을 클릭했을 때의 동작 수행
+        // 여기에서 Fragment2로 이동하는 코드 추가
+
+        //val bundle = Bundle()
+        Log.d("Checking","passed trendy_city_name: $trendy_city_name")
+        //bundle.putString("text_from_clicked_item", trendy_city_name)  // 데이터를 Bundle에 추가
+        //fragment2.arguments = bundle
+        //val searchTripFragment = SearchTrip()
+        //searchTripFragment.initializeWithTrendyCity(trendy_city_name)
+
+
+        // 새로운 SearchTrip fragment를 생성하고 trendyCityName을 설정
+        val searchTripFragment = SearchTrip.newInstance(trendy_city_name)
+
+
+        // ViewPager2의 currentItem을 변경하는 코드
+        activity?.let { nonNullActivity ->
+            val viewPager2 = nonNullActivity.findViewById<ViewPager2>(R.id.viewPager)
+            viewPager2?.currentItem = 1 // 1은 Fragment2의 인덱스, 0부터 시작
+        }
+
+
 
     }
     private fun fetchCities(callback: (List<CityData>) -> Unit) {
