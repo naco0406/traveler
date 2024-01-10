@@ -1,5 +1,6 @@
 // TripFragment.kt
 
+import android.app.DatePickerDialog
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.os.Bundle
@@ -7,14 +8,17 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import androidx.annotation.DrawableRes
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
+import com.example.traveler.MyTrip
 import com.example.traveler.Place
 import com.example.traveler.R
 import com.example.traveler.Trip
@@ -36,7 +40,11 @@ import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import org.json.JSONObject
+import java.io.File
 import java.io.IOException
+import java.util.Calendar
+import java.util.Date
 
 class TripAdapter(private val trip: Trip) : RecyclerView.Adapter<TripAdapter.ViewHolder>() {
 
@@ -184,6 +192,28 @@ class TripFragment : Fragment(), OnMapReadyCallback {
         return view
     }
 
+    override fun onResume() {
+        super.onResume()
+        isUserLoggedIn()
+    }
+    private fun isUserLoggedIn(): Boolean {
+        val fileName = "user_status.json"
+        val file = File(requireActivity().applicationContext.filesDir, fileName)
+        if (!file.exists()) return false
+
+        return try {
+            val content = file.readText()
+            val userData = JSONObject(content)
+            Log.d("isUserLogin", "$userData")
+            val isUserLogin = userData.getBoolean("login_state")
+            Log.d("isUserLogin", "$isUserLogin")
+            isUserLogin
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -194,7 +224,97 @@ class TripFragment : Fragment(), OnMapReadyCallback {
             }
         })
         initializeUI()
+        val importButton = view.findViewById<Button>(R.id.ImportButton)
+        importButton.setOnClickListener {
+//            if (isUserLoggedIn()) {
+//                checkAndSaveTrip()
+//            } else {
+//                showLoginAlert()
+//            }
+            checkAndSaveTrip()
+        }
     }
+
+    private fun showLoginAlert() {
+        context?.let {
+            AlertDialog.Builder(it)
+                .setTitle("로그인 필요")
+                .setMessage("이 기능을 사용하기 위해서는 먼저 로그인해야 합니다.")
+                .setPositiveButton("확인", null)
+                .show()
+        }
+    }
+
+    private fun checkAndSaveTrip() {
+        val fileName = "MyTrip.json"
+        val internalStorageDir = requireActivity().applicationContext.filesDir
+        val file = File(internalStorageDir, fileName)
+
+        if (file.exists()) {
+            // 파일이 존재하면 경고 메시지 표시
+            showAlertDialog(file)
+        } else {
+            // 파일이 존재하지 않으면 trip 데이터를 저장
+            showDatePicker(file)
+        }
+    }
+
+    private fun showAlertDialog(file: File) {
+        context?.let {
+            AlertDialog.Builder(it)
+                .setTitle("경고")
+                .setMessage("이미 MyTrip.json 파일이 존재합니다. 덮어씌우시겠습니까?")
+                .setPositiveButton("예") { dialog, which ->
+                    showDatePicker(file)
+                }
+                .setNegativeButton("아니오", null)
+                .show()
+        }
+    }
+
+    private fun showDatePicker(file: File) {
+        val calendar = Calendar.getInstance()
+        DatePickerDialog(
+            requireContext(),
+            { _, year, month, dayOfMonth ->
+                calendar.set(year, month, dayOfMonth)
+                trip?.let { currentTrip ->
+                    val myTrip = convertTripToMyTrip(currentTrip, calendar.time)
+                    saveMyTripToFile(file, myTrip)
+                }
+            },
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        ).show()
+    }
+
+    fun convertTripToMyTrip(trip: Trip, startDate: Date): MyTrip {
+        val calendar = Calendar.getInstance()
+        calendar.time = startDate
+
+        val endDate = Calendar.getInstance().apply {
+            time = startDate
+            add(Calendar.DAY_OF_MONTH, trip.period)
+        }.time
+
+        return MyTrip(
+            id = trip.id,
+            city = trip.city,
+            start_date = startDate,
+            end_date = endDate,
+            places = trip.places.map { it.toMutableList() }.toMutableList(),
+            selected = trip.selected,
+            review = trip.review.toMutableList()
+        )
+    }
+
+    private fun saveMyTripToFile(file: File, myTrip: MyTrip) {
+        val myTripJson = Gson().toJson(myTrip)
+        file.writeText(myTripJson)
+        // 저장 완료 메시지 또는 다른 후속 조치
+    }
+
 
     private fun isMapInitialized(): Boolean {
         return this::naverMap.isInitialized

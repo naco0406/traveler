@@ -12,9 +12,14 @@ import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.traveler.MyTrip
 import com.example.traveler.Place
 import com.example.traveler.R
 import com.example.traveler.SearchPlaceFragment
+import com.google.android.gms.common.api.ApiException
+import com.google.gson.Gson
+import org.json.JSONObject
+import java.io.File
 
 
 class MyTripDayAdapter(
@@ -72,15 +77,18 @@ class MyTripDayAdapter(
             }
 
             // 확장된 항목에 대한 뷰 높이 및 연결선 길이 조정
-            if (selectedPosition == position) {
-                itemHolder.cardLinearLayout.layoutParams.height = 300/* 확장된 높이 값 */
-                itemHolder.topConnectorLine.layoutParams.height = 300/* 확장된 선의 길이 */
-                itemHolder.bottomConnectorLine.layoutParams.height = 300/* 확장된 선의 길이 */
-            } else {
-                itemHolder.cardLinearLayout.layoutParams.height = 130/* 기본 높이 값 */
-                itemHolder.topConnectorLine.layoutParams.height = 130/* 기본 선의 길이 */
-                itemHolder.bottomConnectorLine.layoutParams.height = 130/* 기본 선의 길이 */
-            }
+//            if (selectedPosition == position) {
+//                itemHolder.cardLinearLayout.layoutParams.height = 300/* 확장된 높이 값 */
+//                itemHolder.topConnectorLine.layoutParams.height = 300/* 확장된 선의 길이 */
+//                itemHolder.bottomConnectorLine.layoutParams.height = 300/* 확장된 선의 길이 */
+//            } else {
+//                itemHolder.cardLinearLayout.layoutParams.height = 130/* 기본 높이 값 */
+//                itemHolder.topConnectorLine.layoutParams.height = 130/* 기본 선의 길이 */
+//                itemHolder.bottomConnectorLine.layoutParams.height = 130/* 기본 선의 길이 */
+//            }
+            itemHolder.cardLinearLayout.layoutParams.height = 130/* 기본 높이 값 */
+            itemHolder.topConnectorLine.layoutParams.height = 130/* 기본 선의 길이 */
+            itemHolder.bottomConnectorLine.layoutParams.height = 130/* 기본 선의 길이 */
             // 장소 변경 로직
             itemHolder.cardView.requestLayout() // 레이아웃 갱신
         } else {
@@ -110,13 +118,30 @@ class MyTripDayAdapter(
     }
 }
 
+interface OnPlaceUpdateListener {
+    fun onPlaceUpdated()
+}
+
+
 
 // TripFragment
 class MyTripDayFragment : Fragment() {
     private var dayActivities: MutableList<Place> = mutableListOf()
-    private var selectedPosition: Int = -1
+    private var selectedPosition: Int = 0
     private var onAddPlaceClicked: (() -> Unit)? = null
     private var selectedPlacePosition: Int = -1
+    private var mytrip: MyTrip? = null
+    private var selectedTabPosition: Int = 0
+
+    var placeUpdateListener: OnPlaceUpdateListener? = null
+
+    private fun updatePlaceInMyTrip(place: Place) {
+        // 장소 업데이트 로직
+        // ...
+
+        // 부모 Fragment에게 알림
+        placeUpdateListener?.onPlaceUpdated()
+    }
 
     private fun openSearchPlaceFragment() {
         val searchPlaceFragment = SearchPlaceFragment().apply {
@@ -132,6 +157,20 @@ class MyTripDayFragment : Fragment() {
     }
 
     private fun handlePlaceSelected(place: Place) {
+        val fileName = "MyTrip.json"
+        val internalStorageDir = requireActivity().applicationContext.getFilesDir()
+        val file = File(internalStorageDir, fileName)
+        val gson = Gson()
+
+        try {
+            val content = file.readText()
+            Log.e("Load JSON", "저장되어 있던 my data 불러오기: $content")
+            val myData = JSONObject(content)
+            mytrip = gson.fromJson(myData.toString(), MyTrip::class.java)
+            Log.d("Load JSON", myData.getString("places").toString())
+        } catch (e: ApiException) {
+        }
+
         if (selectedPlacePosition >= 0 && selectedPlacePosition < dayActivities.size) {
             // 선택된 위치에 장소 변경
             dayActivities[selectedPlacePosition] = place
@@ -140,7 +179,22 @@ class MyTripDayFragment : Fragment() {
             dayActivities.add(place)
         }
         // RecyclerView 업데이트
+
+        placeUpdateListener?.onPlaceUpdated()
         Log.d("dayActivities", "$dayActivities")
+        mytrip?.let { trip ->
+            if (selectedPosition >= 0 && selectedPosition < trip.places.size) {
+                trip.places[selectedTabPosition] = dayActivities // 선택된 날짜의 장소 목록 업데이트
+            } else {
+                // 오류 처리 또는 적절한 액션 수행
+                Log.e("Error", "Selected position is out of bounds")
+            }
+
+            val updatedContent = gson.toJson(trip) // 전체 MyTrip 객체를 JSON으로 변환
+            file.writeText(updatedContent) // 파일에 저장
+
+            Log.d("updatedContent", updatedContent)
+        }
         view?.findViewById<RecyclerView>(R.id.dayRecyclerView)?.adapter?.notifyDataSetChanged()
     }
 
@@ -156,12 +210,13 @@ class MyTripDayFragment : Fragment() {
 
     companion object {
         private const val ARG_DAY_ACTIVITIES = "day_activities"
-        fun newInstance(dayActivities: MutableList<Place>, onAddPlaceClicked: () -> Unit): MyTripDayFragment =
+        fun newInstance(dayActivities: MutableList<Place>, selectedTabPosition: Int, onAddPlaceClicked: () -> Unit): MyTripDayFragment =
             MyTripDayFragment().apply {
                 this.onAddPlaceClicked = onAddPlaceClicked
                 // ... 기존 코드 ...
                 arguments = Bundle().apply {
                     putParcelableArrayList(ARG_DAY_ACTIVITIES, ArrayList(dayActivities))
+                    putInt("selected_tab_position", selectedTabPosition)
                 }
             }
 
@@ -171,12 +226,14 @@ class MyTripDayFragment : Fragment() {
         super.onCreate(savedInstanceState)
         arguments?.let {
             dayActivities = it.getParcelableArrayList<Place>(ARG_DAY_ACTIVITIES) ?: mutableListOf()
+            selectedTabPosition = it.getInt("selected_tab_position")
         }
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
+
         val view = inflater.inflate(R.layout.fragment_input_day, container, false)
         val recyclerView = view.findViewById<RecyclerView>(R.id.dayRecyclerView)
         recyclerView.layoutManager = LinearLayoutManager(context)
