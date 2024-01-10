@@ -24,6 +24,7 @@ import com.example.traveler.R
 import com.example.traveler.Trip
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.gson.Gson
@@ -224,7 +225,7 @@ class TripFragment : Fragment(), OnMapReadyCallback {
             }
         })
         initializeUI()
-        val importButton = view.findViewById<Button>(R.id.ImportButton)
+        val importButton = view.findViewById<FloatingActionButton>(R.id.ImportButton)
         importButton.setOnClickListener {
 //            if (isUserLoggedIn()) {
 //                checkAndSaveTrip()
