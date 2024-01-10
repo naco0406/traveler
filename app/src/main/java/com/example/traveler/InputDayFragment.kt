@@ -71,19 +71,16 @@ class MyTripDayAdapter(
                 onItemClicked(position)
             }
 
-//            // 확장된 항목에 대한 뷰 높이 및 연결선 길이 조정
-//            if (selectedPosition == position) {
-//                itemHolder.cardLinearLayout.layoutParams.height = 300/* 확장된 높이 값 */
-//                itemHolder.topConnectorLine.layoutParams.height = 300/* 확장된 선의 길이 */
-//                itemHolder.bottomConnectorLine.layoutParams.height = 300/* 확장된 선의 길이 */
-//            } else {
-//                itemHolder.cardLinearLayout.layoutParams.height = 150/* 기본 높이 값 */
-//                itemHolder.topConnectorLine.layoutParams.height = 150/* 기본 선의 길이 */
-//                itemHolder.bottomConnectorLine.layoutParams.height = 150/* 기본 선의 길이 */
-//            }
-            itemHolder.cardLinearLayout.layoutParams.height = 150/* 기본 높이 값 */
-            itemHolder.topConnectorLine.layoutParams.height = 150/* 기본 선의 길이 */
-            itemHolder.bottomConnectorLine.layoutParams.height = 150/* 기본 선의 길이 */
+            // 확장된 항목에 대한 뷰 높이 및 연결선 길이 조정
+            if (selectedPosition == position) {
+                itemHolder.cardLinearLayout.layoutParams.height = 300/* 확장된 높이 값 */
+                itemHolder.topConnectorLine.layoutParams.height = 300/* 확장된 선의 길이 */
+                itemHolder.bottomConnectorLine.layoutParams.height = 300/* 확장된 선의 길이 */
+            } else {
+                itemHolder.cardLinearLayout.layoutParams.height = 130/* 기본 높이 값 */
+                itemHolder.topConnectorLine.layoutParams.height = 130/* 기본 선의 길이 */
+                itemHolder.bottomConnectorLine.layoutParams.height = 130/* 기본 선의 길이 */
+            }
             // 장소 변경 로직
             itemHolder.cardView.requestLayout() // 레이아웃 갱신
         } else {
@@ -159,16 +156,7 @@ class MyTripDayFragment : Fragment() {
 
     companion object {
         private const val ARG_DAY_ACTIVITIES = "day_activities"
-//        fun newInstance(dayActivities: MutableList<Place>, onAddPlaceClicked: () -> Unit): MyTripDayFragment =
-//            MyTripDayFragment().apply {
-//                this.onAddPlaceClicked = onAddPlaceClicked
-//                // ... 기존 코드 ...
-//                arguments = Bundle().apply {
-//                    putParcelableArrayList(ARG_DAY_ACTIVITIES, ArrayList(dayActivities))
-//                }
-//            }
-
-        fun newInstance(dayActivities: MutableList<Place>, ): MyTripDayFragment =
+        fun newInstance(dayActivities: MutableList<Place>, onAddPlaceClicked: () -> Unit): MyTripDayFragment =
             MyTripDayFragment().apply {
                 this.onAddPlaceClicked = onAddPlaceClicked
                 // ... 기존 코드 ...
