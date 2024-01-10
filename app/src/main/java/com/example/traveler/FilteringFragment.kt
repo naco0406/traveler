@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 
@@ -44,10 +45,10 @@ class FilteringFragment : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val peopleNum_plusButton = view.findViewById<Button>(R.id.peopleNum_plusButton)
-        val peopleNum_minusButton = view.findViewById<Button>(R.id.peopleNum_minusButton)
-        val period_plusButton = view.findViewById<Button>(R.id.period_plusButton)
-        val period_minusButton = view.findViewById<Button>(R.id.period_minusButton)
+        val peopleNum_plusButton = view.findViewById<ImageButton>(R.id.peopleNum_plusButton)
+        val peopleNum_minusButton = view.findViewById<ImageButton>(R.id.peopleNum_minusButton)
+        val period_plusButton = view.findViewById<ImageButton>(R.id.period_plusButton)
+        val period_minusButton = view.findViewById<ImageButton>(R.id.period_minusButton)
 
         // + 버튼 클릭 시 호출되는 함수 설정
         peopleNum_plusButton.setOnClickListener {
