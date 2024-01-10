@@ -34,7 +34,8 @@ class SearchTrip : Fragment() {
     private var outerRouteList = mutableListOf<Trip>()
     private var fullRouteList = mutableListOf<Trip>()
     private lateinit var editTextSearch: EditText
-    private var trendyCityName: String? = null
+    //private var trendyCityName: String? = null
+    private var trendyCityName = "대전"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -165,10 +166,7 @@ class SearchTrip : Fragment() {
         }
     }
 
-    fun initializeWithTrendyCity(trendyCityName: String) {
-        this.trendyCityName = trendyCityName
-        // 다른 초기화 작업이 필요하다면 이곳에서 수행
-    }
+
 
     private fun startTripFragment(trip: Trip) {
         val fragment = TripFragment().apply {
