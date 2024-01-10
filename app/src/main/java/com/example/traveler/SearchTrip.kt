@@ -15,6 +15,7 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.text.set
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -47,6 +48,7 @@ class SearchTrip : Fragment() {
         val view = inflater.inflate(R.layout.fragment_search_trip, container, false)
         editTextSearch = view.findViewById(R.id.searchRoute_editText)
         val filteringButton = view.findViewById<ImageView>(R.id.filteringButton)
+        val resetButton = view.findViewById<ImageView>(R.id.reset_filter)
 
 
         //fetchTrips()
@@ -99,6 +101,13 @@ class SearchTrip : Fragment() {
         filteringButton.setOnClickListener {
             openDialog()
 
+        }
+
+        resetButton.setOnClickListener {
+            if (editTextSearch.text != null) {
+                editTextSearch.setText("")
+            }
+            updateListWithFullItems()
         }
 
         return view
@@ -177,32 +186,37 @@ class SearchTrip : Fragment() {
 
     private fun filterItems2(target_numPeople: Int, target_period: Int) {
         val fullItemList = outerRouteList/* your original full list of items */
-        lateinit var filteredList: List<Trip>
+
+
+        val filteredList = outerRouteList.filter { trip ->
+            trip.period == target_period || trip.numPeople == target_numPeople
+        }
 
         // Filter the items based on the criteria
         //val filteredList = fullItemList.filter { it.city.contains(query, ignoreCase = true) }
-        if (target_numPeople==0 && target_period != 0) {
-            filteredList = outerRouteList.filter { trip->
-                trip.period == target_period
-            }
-        }
+//        if (target_numPeople==0 && target_period != 0) {
+//            filteredList = outerRouteList.filter { trip->
+//                trip.period == target_period
+//            }
+//        }
+//
+//        else if (target_numPeople != 0 && target_period == 0) {
+//            filteredList = outerRouteList.filter { trip->
+//                trip.numPeople == target_numPeople
+//            }
+//        }
+//
+//        else if (target_numPeople == 0 && target_period == 0) {
+//            filteredList = outerRouteList.filter { trip->
+//                trip.numPeople ==target_numPeople || trip.period == target_period
+//            }
+//        }
+//
+//
+//        else {
+//            filteredList = outerRouteList
+//        }
 
-        else if (target_numPeople != 0 && target_period == 0) {
-            filteredList = outerRouteList.filter { trip->
-                trip.numPeople == target_numPeople
-            }
-        }
-
-        else if (target_numPeople == 0 && target_period == 0) {
-            filteredList = outerRouteList.filter { trip->
-                trip.numPeople ==target_numPeople || trip.period == target_period
-            }
-        }
-
-
-        else {
-            filteredList = outerRouteList
-        }
 
 
 

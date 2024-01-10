@@ -24,7 +24,8 @@ class FilteringFragment : DialogFragment() {
         super.onStart()
 
         val width = (resources.displayMetrics.widthPixels * 0.8).toInt()
-        dialog?.window?.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
+        val height = (resources.displayMetrics.heightPixels * 0.8).toInt()
+        dialog?.window?.setLayout(width, height)
     }
 
     override fun onCreateView(
