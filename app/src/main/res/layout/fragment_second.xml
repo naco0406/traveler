@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@color/background"
     tools:context=".SecondFragment">
     <LinearLayout
         android:id="@+id/bottom_sheet"
@@ -30,6 +30,11 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="16dp">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:id="@+id/loginRequiredTextView"/>
                     <LinearLayout
                         android:id="@+id/bottomSheetToolbar"
                         android:layout_width="match_parent"
@@ -63,6 +68,7 @@
                                 android:src="@drawable/img_gwm"
                                 android:scaleType="centerCrop"/>
                         </androidx.cardview.widget.CardView>
+
                         <FrameLayout
                             android:id="@+id/bottomSheetImageSpace"
                             android:layout_width="250dp"
@@ -122,6 +128,15 @@
                                 android:layout_gravity="end|center_vertical"/>
                         </FrameLayout>
                     </LinearLayout>
+                    <ScrollView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/bottom_framelayout"/>
+                    </ScrollView>
+
                 </LinearLayout>
 
 
@@ -140,33 +155,7 @@
                         android:textStyle="bold"
                         android:textSize="25dp"
                         android:padding="16dp"/>
-                    <LinearLayout
-                        android:id="@+id/placelinearLayout"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginTop="8dp"
-                        android:orientation="horizontal">
-                        <!-- 이미지 뷰들 -->
-                        <ImageView
-                            android:id="@+id/imageView1"
-                            android:layout_width="100dp"
-                            android:layout_height="100dp"
-                            android:layout_weight="1"
-                            android:src="@drawable/img_gwm" />
-                        <ImageView
-                            android:id="@+id/imageView2"
-                            android:layout_width="100dp"
-                            android:layout_height="100dp"
-                            android:layout_weight="1"
-                            android:src="@drawable/img_hud" />
-                        <ImageView
-                            android:id="@+id/imageView3"
-                            android:layout_width="100dp"
-                            android:layout_height="100dp"
-                            android:layout_weight="1"
-                            android:src="@drawable/img_gwm" />
-                    </LinearLayout>
+
                 </LinearLayout>
 
 
@@ -211,7 +200,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:background="@color/black"
+            android:background="@color/background"
             android:layout_below="@+id/toolbar">
             <ScrollView
                 android:layout_width="match_parent"
@@ -268,14 +257,14 @@
                             android:overScrollMode="never"/>
                     </LinearLayout>
 
-                    <android.widget.Space
-                        android:layout_width="0dp"
-                        android:layout_height="1000dp" />
+<!--                    <android.widget.Space-->
+<!--                        android:layout_width="0dp"-->
+<!--                        android:layout_height="1000dp" />-->
 
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="연락처"/>
+<!--                    <TextView-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:text="연락처"/>-->
                 </LinearLayout>
             </ScrollView>
         </androidx.coordinatorlayout.widget.CoordinatorLayout>

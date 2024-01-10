@@ -4,6 +4,7 @@
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/fragment3_container"
+    android:background="@color/background"
     tools:context=".ThirdFragment">
 
 </FrameLayout>

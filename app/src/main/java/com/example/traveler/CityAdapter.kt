@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -32,7 +33,7 @@ class CityAdapter(private val context: Context, private val listener: OnItemClic
 
         private val txtName: TextView = itemView.findViewById(R.id.rv_name)
         private val imgProfile: ImageView = itemView.findViewById(R.id.rv_photo)
-        private val trendy_city: LinearLayout = itemView.findViewById(R.id.trendy_city)
+        private val trendy_city: FrameLayout = itemView.findViewById(R.id.trendy_city)
 
         init {
             trendy_city.setOnClickListener {
