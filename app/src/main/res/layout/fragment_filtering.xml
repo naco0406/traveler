@@ -9,24 +9,27 @@
     <!-- TODO: Update blank fragment layout -->
     <Button
         android:id="@+id/backButton"
-        android:layout_width="wrap_content"
+        android:layout_width="120dp"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:text="취소"/>
+        android:foreground="@drawable/cancel_button"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="7"
+        android:layout_weight="8"
         android:orientation="vertical"
         android:layout_marginBottom="100dp">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_marginLeft="20dp"
+            android:textSize="20dp"
+            android:textStyle="bold"
             android:gravity="center_vertical"
             android:layout_weight="5"
-            android:text="여행 인원을 입력해주세요." />
+            android:text="1. 여행 인원을 입력해주세요." />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -40,7 +43,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:text="minus"/>
+                android:foreground="@drawable/minus_button"/>
 
 
             <TextView
@@ -49,6 +52,8 @@
                 android:layout_height="match_parent"
                 android:layout_weight="2"
                 android:gravity="center"
+                android:textSize="25dp"
+                android:textStyle="bold"
                 android:text="0"/>
 
             <Button
@@ -57,15 +62,19 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:text="plus"/>
+                android:foreground="@drawable/plus_button"/>
+
         </LinearLayout>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_marginLeft="20dp"
+            android:textSize="20dp"
+            android:textStyle="bold"
             android:gravity="center_vertical"
             android:layout_weight="5"
-            android:text = "여행 기간을 입력해주세요."/>
+            android:text = "2. 여행 기간을 입력해주세요."/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -79,7 +88,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:text="minus"/>
+                android:foreground="@drawable/minus_button"/>
 
 
             <TextView
@@ -88,6 +97,8 @@
                 android:layout_height="match_parent"
                 android:layout_weight="2"
                 android:gravity="center"
+                android:textSize="25dp"
+                android:textStyle="bold"
                 android:text="0"/>
 
             <Button
@@ -96,7 +107,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:text="plus"/>
+                android:foreground="@drawable/plus_button"/>
         </LinearLayout>
 
 
@@ -109,7 +120,9 @@
         android:layout_width="150dp"
         android:layout_height="0dp"
         android:layout_gravity="bottom|right"
+        android:layout_marginBottom="10dp"
         android:layout_weight="1"
-        android:text="검색"/>
+        android:foreground="@drawable/search_button"/>
+
 
 </LinearLayout>

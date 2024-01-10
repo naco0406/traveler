@@ -171,7 +171,7 @@ class LoginFragment : Fragment() {
                             Log.d("userData", "$userData")
 
                             // 업데이트된 내용을 파일에 다시 쓰기
-                            file.writeText(userData.toString())
+                            loginFile.writeText(userData.toString())
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()
@@ -250,13 +250,13 @@ class LoginFragment : Fragment() {
                                     try {
                                         // 파일이 존재하는 경우, 해당 파일을 읽어와서 내용을 업데이트
                                         if (loginFile.exists()) {
-                                            val content = file.readText()
+                                            val content = loginFile.readText()
                                             val userData = JSONObject(content)
                                             userData.put("login_state", true) // 로그인 상태를 true로 업데이트
                                             // 기타 필요한 업데이트 작업 수행 가능
 
                                             // 업데이트된 내용을 파일에 다시 쓰기
-                                            file.writeText(userData.toString())
+                                            loginFile.writeText(userData.toString())
                                         }
                                     } catch (e: Exception) {
                                         e.printStackTrace()

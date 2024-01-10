@@ -127,11 +127,18 @@ class SearchPlaceFragment : Fragment() {
                     val fileName = "MyTrip.json"
                     val internalStorageDir = requireActivity().applicationContext.getFilesDir()
                     val file = File(internalStorageDir, fileName)
+                    var filteredTrips = sortedTrips
                     try {
                         val content = file.readText()
                         val myData = JSONObject(content)
                         val mytrip_city = myData.getString("city")
                         Log.d("Checking","mytrip_city: $mytrip_city")
+
+                        filteredTrips = sortedTrips.filter { it.city.contains(mytrip_city, ignoreCase = true)}
+
+
+                        Log.d("Filter","filtered list: $filteredTrips")
+
                     }
                     catch (e: Exception) {
                         e.printStackTrace()
@@ -139,7 +146,7 @@ class SearchPlaceFragment : Fragment() {
 
                     activity?.runOnUiThread {
                         placeList.clear()
-                        placeList.addAll(sortedTrips)
+                        placeList.addAll(filteredTrips)
                         placeSearchAdapter.updateData(placeList)
                     }
                 }
