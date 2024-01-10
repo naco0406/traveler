@@ -85,3 +85,15 @@
 - 저장을 누르면 나만의 여행 경로 설정이 완료되며, 데이터 베이스에 저장됩니다.
 
 [APK 다운로드](https://drive.google.com/file/d/1y2uudgB_FZTviuNIXBMxhaGnlkO2WY5V/view?usp=sharing)
+
+
+### 나만 보기 아까운 애니메이션 모음
+
+
+https://github.com/naco0406/traveler/assets/129248939/8b3d1b74-a326-40a4-9c8f-e0ca55d38523
+
+
+https://github.com/naco0406/traveler/assets/129248939/2e1f2c5b-67ec-4384-b1d3-e27dec23112b
+
+
+
