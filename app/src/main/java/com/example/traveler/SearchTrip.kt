@@ -13,6 +13,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -38,6 +39,7 @@ class SearchTrip : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_search_trip, container, false)
         editTextSearch = view.findViewById(R.id.searchRoute_editText)
+        val filteringButton = view.findViewById<ImageView>(R.id.filteringButton)
 
 
         fetchTrips()
@@ -57,6 +59,14 @@ class SearchTrip : Fragment() {
         val outerRecyclerView: RecyclerView = view.findViewById(R.id.outer_recyclerView)
         outerRecyclerView.layoutManager = LinearLayoutManager(context)
         outerRecyclerView.adapter = outerRouteAdapter
+
+        //filtering을 위한 dialogFragment 생성
+
+        filteringButton.setOnClickListener {
+            openDialog()
+
+        }
+
 
 
         editTextSearch.addTextChangedListener(object : TextWatcher {
@@ -86,11 +96,30 @@ class SearchTrip : Fragment() {
         return view
     }
 
+    //Dialog에서 result 받아오는 function
+
+    private fun openDialog() {
+        val dialogFragment = FilteringFragment()
+        dialogFragment.show(parentFragmentManager, "FilteringFragment")
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         outerRouteAdapter.onItemClickListener = { trip ->
             startTripFragment(trip)
+        }
+
+        parentFragmentManager.setFragmentResultListener(
+            "dialog_result",
+            viewLifecycleOwner
+        ) { _, result ->
+            // 결과 수신 시 실행되는 코드
+            val numPeople = result.getInt("num_people", 0)
+            val period = result.getInt("period", 0)
+            Log.d("Receive", "Received Data: $numPeople, and $period(period)")
+            filterItems2(numPeople,period)
+
         }
     }
 
@@ -105,6 +134,48 @@ class SearchTrip : Fragment() {
             .replace(R.id.SearchTripContainer, fragment)
             .addToBackStack(null)
             .commit()
+    }
+
+
+    private fun filterItems2(target_numPeople: Int, target_period: Int) {
+        val fullItemList = outerRouteList/* your original full list of items */
+        lateinit var filteredList: List<Trip>
+
+        // Filter the items based on the criteria
+        //val filteredList = fullItemList.filter { it.city.contains(query, ignoreCase = true) }
+        if (target_numPeople==0 && target_period != 0) {
+            filteredList = outerRouteList.filter { trip->
+                trip.period == target_period
+            }
+        }
+
+        else if (target_numPeople != 0 && target_period == 0) {
+            filteredList = outerRouteList.filter { trip->
+                trip.numPeople == target_numPeople
+            }
+        }
+
+        else if (target_numPeople == 0 && target_period == 0) {
+            filteredList = outerRouteList.filter { trip->
+                trip.numPeople ==target_numPeople || trip.period == target_period
+            }
+        }
+
+
+        else {
+            filteredList = outerRouteList
+        }
+
+
+
+
+
+
+        Log.d("Filter2","filtered list2: $filteredList")
+
+
+        // Update the RecyclerView with the filtered data
+        outerRouteAdapter.updateData(filteredList)
     }
 
     private fun filterItems(query: String) {
@@ -148,12 +219,13 @@ class SearchTrip : Fragment() {
 
                     val tripListType = object : TypeToken<List<Trip>>() {}.type
                     val trips = Gson().fromJson<List<Trip>>(responseBody, tripListType)
+                    val sortedTrips = trips.sortedByDescending { it.selected }
 
-                    if (trips.isNotEmpty()) {
+                    if (sortedTrips.isNotEmpty()) {
                         activity?.runOnUiThread {
                             //outerRouteAdapter.updateData(trips)
-                            outerRouteListLiveData.postValue(trips)
-                            Log.d("Total","total data: $trips")
+                            outerRouteListLiveData.postValue(sortedTrips)
+                            Log.d("Total","total data: $sortedTrips")
                             //initializeUI()
                         }
                     }

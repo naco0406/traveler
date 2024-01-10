@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.ToggleButton
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -46,6 +47,7 @@ class OuterRouteAdapter(private val context: Context, private var OuterRouteList
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val innerRecyclerView: RecyclerView = itemView.findViewById(R.id.inner_recyclerView)
         val likeButton = itemView.findViewById<ToggleButton>(R.id.likeButton)
+        val selectedValue = itemView.findViewById<TextView>(R.id.selectedValue)
 
         init {
             // ToggleButton의 상태가 변경될 때의 동작 정의
@@ -60,6 +62,7 @@ class OuterRouteAdapter(private val context: Context, private var OuterRouteList
 
         fun bind(routeList: Trip) {
             // Inner RecyclerView Setup
+            selectedValue.text = routeList.selected.toString()
             val places = routeList.places[0]
             val innerAdapter = RouteAdapter(places)
             innerRecyclerView.layoutManager = LinearLayoutManager(itemView.context, LinearLayoutManager.HORIZONTAL, false)

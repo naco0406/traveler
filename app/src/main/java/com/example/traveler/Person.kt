@@ -9,9 +9,9 @@ import org.json.JSONObject
 @Serializable
 data class Person(
     val name: String="Unknown",
-    val phone: String,
-    val nickname: String="Unknown",
-    val password: String,
+    val phone: String="",
+    val nickname: String="Nickname",
+    val password: String="",
 )
 fun parseJson(jsonString: String): Person {
     return Json.decodeFromString(jsonString)
