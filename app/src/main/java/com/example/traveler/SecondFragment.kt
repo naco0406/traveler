@@ -334,7 +334,13 @@ class SecondFragment : Fragment(), OnItemClickListener {
 
 
         // 새로운 SearchTrip fragment를 생성하고 trendyCityName을 설정
-        val searchTripFragment = SearchTrip.newInstance(trendy_city_name)
+        //val searchTripFragment = SearchTrip.newInstance(trendy_city_name)
+        val resultBundle = Bundle().apply {
+            putString("selected_trendy_city",trendy_city_name)
+        }
+
+        parentFragmentManager.setFragmentResult("selected_trendy_city", resultBundle)
+
 
 
         // ViewPager2의 currentItem을 변경하는 코드

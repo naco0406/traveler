@@ -262,6 +262,10 @@ class LoginFragment : Fragment() {
                                         e.printStackTrace()
                                     }
 
+                                    val adapter = viewPager2.adapter as ViewPager2Adapter
+                                    adapter.updateItemCount(4)
+
+
                                     parentFragmentManager.beginTransaction().apply{
                                         replace(R.id.fragment3_container, MyPageFragment())
                                         setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)

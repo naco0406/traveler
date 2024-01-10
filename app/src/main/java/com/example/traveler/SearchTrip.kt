@@ -35,11 +35,12 @@ class SearchTrip : Fragment() {
     private var fullRouteList = mutableListOf<Trip>()
     private lateinit var editTextSearch: EditText
     //private var trendyCityName: String? = null
-    private var trendyCityName = "대전"
+    private var trendyCityName = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         fetchTrips()
+
     }
 
     override fun onCreateView(
@@ -104,6 +105,7 @@ class SearchTrip : Fragment() {
 
         }
 
+
         resetButton.setOnClickListener {
             if (editTextSearch.text != null) {
                 editTextSearch.setText("")
@@ -114,15 +116,6 @@ class SearchTrip : Fragment() {
         return view
     }
 
-    companion object {
-        fun newInstance(trendyCityName: String): SearchTrip {
-            val fragment = SearchTrip()
-            val args = Bundle()
-            args.putString("trendyCityName", trendyCityName)
-            fragment.arguments = args
-            return fragment
-        }
-    }
 
     //Dialog에서 result 받아오는 function
 
@@ -135,10 +128,6 @@ class SearchTrip : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
 
-        trendyCityName?.let { cityName ->
-            Log.d("Checking","cityname in SearchTrip: $cityName")
-            filterItems(cityName)
-        }
 
         outerRouteAdapter.onItemClickListener = { trip ->
             startTripFragment(trip)
@@ -159,11 +148,17 @@ class SearchTrip : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        Log.d("Checking","nullable check: $trendyCityName")
-        trendyCityName?.let { cityName ->
-            Log.d("Checking","cityname in SearchTrip: $cityName")
-            filterItems(cityName)
-        }
+//        Log.d("Checking","nullable check: $trendyCityName")
+//        parentFragmentManager.setFragmentResultListener(
+//            "selected_trendy_city",
+//            viewLifecycleOwner
+//        ) { _, result ->
+//            // 결과 수신 시 실행되는 코드
+//            trendyCityName = result.getString("selected_trendy_city", "null")
+//            Log.d("Receive", "Received Data: $trendyCityName")
+//            filterItems(trendyCityName)
+//
+//        }
     }
 
 
