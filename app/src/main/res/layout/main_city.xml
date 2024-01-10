@@ -15,7 +15,8 @@
             android:layout_height="wrap_content"
             android:layout_margin="12dp"
             android:layout_gravity="center_vertical"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:id="@+id/trendy_city">
             <ImageView
                 android:id="@+id/rv_photo"
                 android:layout_width="30dp"

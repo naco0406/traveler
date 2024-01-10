@@ -21,6 +21,8 @@ import okhttp3.Callback
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
+import org.json.JSONObject
+import java.io.File
 import java.io.IOException
 
 class PlaceSearchAdapter(private var places: List<Place>) : RecyclerView.Adapter<PlaceSearchAdapter.PlaceViewHolder>() {
@@ -120,11 +122,24 @@ class SearchPlaceFragment : Fragment() {
                     val gson = Gson()
                     val placeListType = object : TypeToken<List<Place>>() {}.type
                     val places = gson.fromJson<List<Place>>(responseBody, placeListType)
+                    val sortedTrips = places.sortedByDescending { it.visited }
 //                    Log.d("placesLog", "$places")
+                    val fileName = "MyTrip.json"
+                    val internalStorageDir = requireActivity().applicationContext.getFilesDir()
+                    val file = File(internalStorageDir, fileName)
+                    try {
+                        val content = file.readText()
+                        val myData = JSONObject(content)
+                        val mytrip_city = myData.getString("city")
+                        Log.d("Checking","mytrip_city: $mytrip_city")
+                    }
+                    catch (e: Exception) {
+                        e.printStackTrace()
+                    }
 
                     activity?.runOnUiThread {
                         placeList.clear()
-                        placeList.addAll(places)
+                        placeList.addAll(sortedTrips)
                         placeSearchAdapter.updateData(placeList)
                     }
                 }
