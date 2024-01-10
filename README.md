@@ -1,5 +1,5 @@
 # Mr. 길버트
-![대지 1_4](https://github.com/naco0406/traveler/assets/129248939/50cfca8c-967f-47a1-8e69-d20d662c3c27)
+![대지 1_4](https://github.com/naco0406/traveler/assets/129248939/7b8a55ba-b38d-4c19-8a7d-04fd58aa6d24)
 
 
 ## 💻 프로젝트 개요
