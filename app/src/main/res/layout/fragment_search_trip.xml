@@ -4,6 +4,8 @@
     android:id="@+id/SearchTripContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/background"
+    android:padding="16dp"
     tools:context=".SearchTrip">
 
     <!-- TODO: Update blank fragment layout -->
@@ -22,6 +24,7 @@
                 android:padding="10dp"
                 android:id="@+id/searchRoute_editText"
                 android:hint="Enter city or tags."
+                android:layout_marginVertical="12dp"
                 android:layout_gravity="center"/>
 
             <ImageView
@@ -30,6 +33,7 @@
                 android:layout_height="wrap_content"
                 android:src="@drawable/filter_icon"
                 android:layout_gravity="center_vertical"
+                android:layout_marginVertical="12dp"
                 android:layout_weight="1"/>
 
 
@@ -41,7 +45,7 @@
             android:id="@+id/outer_recyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#E3D2DD"/>
+            android:background="@color/background"/>
 
     </LinearLayout>
 

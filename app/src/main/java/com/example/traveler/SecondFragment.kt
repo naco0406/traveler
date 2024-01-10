@@ -1,5 +1,7 @@
 package com.example.traveler
 
+import BottomTripFragment
+import TripFragment
 import android.animation.LayoutTransition
 import android.os.Bundle
 import android.transition.TransitionManager
@@ -17,6 +19,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.Space
+import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -30,6 +33,8 @@ import okhttp3.Request
 import okhttp3.Response
 import org.json.JSONArray
 import org.json.JSONException
+import org.json.JSONObject
+import java.io.File
 import java.io.IOException
 
 
@@ -41,6 +46,105 @@ class SecondFragment : Fragment(), OnItemClickListener {
 
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<View>
     private var trendy_city_name = ""
+
+    private fun isUserLoggedIn(): Boolean {
+        val fileName = "user_status.json"
+        val file = File(requireActivity().applicationContext.filesDir, fileName)
+        if (!file.exists()) return false
+
+        return try {
+            val content = file.readText()
+            val userData = JSONObject(content)
+            userData.getBoolean("login_state")
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+
+//    private fun setupBottomSheet() {
+//        val bottomSheet = view?.findViewById<LinearLayout>(R.id.bottom_sheet)
+//        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
+//
+//        if (!isUserLoggedIn()) {
+//            // 로그인 상태가 아닐 경우
+//            bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+//            bottomSheetBehavior.isDraggable = false
+//
+//            // 로그인 요청 메시지 표시
+//            showLoginRequiredMessage()
+//        } else {
+//            // 로그인 상태일 경우
+//            bottomSheetBehavior.isDraggable = true
+//            bottomSheetBehavior.peekHeight = resources.getDimensionPixelSize(R.dimen.bottom_sheet_peek_height_month)
+//            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+//        }
+//    }
+
+    private fun showLoginRequiredMessage() {
+        // 여기에서 로그인하라는 메시지를 표시하거나, 로그인 요청을 위한 UI 요소를 활성화
+        val loginRequiredTextView = view?.findViewById<TextView>(R.id.loginRequiredTextView)
+        loginRequiredTextView?.visibility = View.VISIBLE
+        loginRequiredTextView?.text = "로그인이 필요한 기능입니다."
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (isUserLoggedIn()) {
+            fetchClosestFutureMyTrip()
+        }
+    }
+
+    private fun fetchClosestFutureMyTrip() {
+        val client = OkHttpClient()
+        val serverIp = getString(R.string.server_ip)
+        val url = "$serverIp/get_closest_future_mytrip"
+        val request = Request.Builder()
+            .url(url)
+            .get()
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onResponse(call: Call, response: Response) {
+                val responseBody = response.body?.string()
+                if (response.isSuccessful && responseBody != null) {
+                    val myTrip = Gson().fromJson(responseBody, MyTrip::class.java)
+                    activity?.runOnUiThread {
+                        displayMyTrip(myTrip)
+                    }
+                } else {
+                    Log.e("SecondFragment", "Server responded with error")
+                }
+            }
+
+            override fun onFailure(call: Call, e: IOException) {
+                Log.e("SecondFragment", "Error fetching closest future mytrip", e)
+            }
+        })
+    }
+
+    private fun displayMyTrip(myTrip: MyTrip) {
+        val bottomSheetContent = requireActivity().findViewById<LinearLayout>(R.id.bottomSheetContent)
+
+        val bottomTripFragment = BottomTripFragment().apply {
+            arguments = Bundle().apply {
+                putString("myTripJson", Gson().toJson(myTrip))
+            }
+        }
+
+        // TripFragment를 FrameLayout에 동적으로 추가
+        childFragmentManager.beginTransaction().apply {
+            val frameLayout = FrameLayout(requireContext()).apply {
+                id = View.generateViewId() // 동적으로 ID 생성
+            }
+            bottomSheetContent.addView(frameLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+            replace(frameLayout.id, bottomTripFragment)
+            commit()
+        }
+    }
+
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -62,8 +166,26 @@ class SecondFragment : Fragment(), OnItemClickListener {
         val bottomSheetInfo = view.findViewById<LinearLayout>(R.id.bottomSheetInfo)
         val bottomSheetContent = view.findViewById<LinearLayout>(R.id.bottomSheetContent)
 
-        val placelinearLayout = view.findViewById<LinearLayout>(R.id.placelinearLayout)
-        placelinearLayout.layoutTransition = LayoutTransition()
+//        setupBottomSheet()
+
+//        val bottomtripFragment = BottomTripFragment().apply {
+//            arguments = Bundle().apply {
+//                // 필요한 경우 TripFragment에 전달할 데이터 설정
+//            }
+//        }
+//
+//        // Fragment를 동적으로 추가하기 위한 Transaction 시작
+//        childFragmentManager.beginTransaction().apply {
+//            // LinearLayout 내부에 FrameLayout을 추가하여 그 안에 Fragment를 삽입
+//            val frameLayout = FrameLayout(requireContext()).apply {
+//                id = R.id.bottom_framelayout // 동적으로 ID 생성
+//            }
+//            bottomSheetContent.addView(frameLayout, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+//
+//            // FrameLayout에 TripFragment 추가
+//            replace(frameLayout.id, bottomtripFragment)
+//            commit()
+//        }
 
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
         bottomSheetBehavior.peekHeight = resources.getDimensionPixelSize(R.dimen.bottom_sheet_peek_height_month)
@@ -293,10 +415,12 @@ class SecondFragment : Fragment(), OnItemClickListener {
         val placeDataList = mutableListOf<PlaceData>()
         try {
             val jsonArray = JSONArray(jsonString)
+//            Log.d("placeDataList1", jsonArray.toString())
             for (i in 0 until jsonArray.length()) {
                 val jsonObject = jsonArray.getJSONObject(i)
                 val name = jsonObject.getString("name")
-                placeDataList.add(PlaceData(name = name, img = R.drawable.img_gwm))
+                val img = jsonObject.getString("img")
+                placeDataList.add(PlaceData(name = name, img = img))
             }
         } catch (e: JSONException) {
             e.printStackTrace()
