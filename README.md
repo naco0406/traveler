@@ -25,7 +25,6 @@
 ### Main 화면
 <p align="center", width="100%">
   <img width="30%" height="30%" alt="자산 17@2x" src="https://github.com/naco0406/traveler/assets/129248939/68910b05-ed7b-4be2-acee-79730f33f516">
-![gif1](https://github.com/naco0406/traveler/assets/129248939/6c8fd0a8-e520-4680-a2cc-8c3604c87bcb)
 
 </p>
 - 현재 인기 있는 여행지(도시, 장소)들을 한눈에 살펴볼 수 있습니다.
@@ -58,7 +57,6 @@
 <p align="center", width="100%">
   <img width="30%" height="30%" alt="자산 16@2x" src="https://github.com/naco0406/traveler/assets/129248939/4211532e-cc76-474c-a42c-46ec043ade66">
   <img width="30%" height="30%" alt="자산 12@2x" src="https://github.com/naco0406/traveler/assets/129248939/5320a8d3-2e56-400f-95e9-83456eb1e93b">
-![gif2](https://github.com/naco0406/traveler/assets/129248939/724bce17-afd1-4459-939b-a703ed089e89)
 
 </p>
 - 사용자들이 실제로 경험해본, 자신만의 여행 경로들이 게시판에 추천순대로 보여집니다.
