@@ -4,6 +4,8 @@ import android.app.AlertDialog
 import android.media.Image
 import android.os.Bundle
 import android.service.autofill.UserData
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -44,6 +46,7 @@ import java.io.File
 
 class LoginFragment : Fragment() {
     private val TAG = this.javaClass.simpleName
+    private lateinit var viewPager2: ViewPager2
 //    private var name: String = ""
 //    private var phoneNum: String = ""
 //    private val viewModel: SignViewModel by activityViewModels()
@@ -70,6 +73,11 @@ class LoginFragment : Fragment() {
 //        }
 //    }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewPager2 = requireActivity().findViewById(R.id.viewPager)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -82,6 +90,51 @@ class LoginFragment : Fragment() {
         val loginButton = rootView.findViewById<Button>(R.id.loginButton)
         val loginPhone = rootView.findViewById<EditText>(R.id.login_phoneNum)
         val loginPassword = rootView.findViewById<EditText>(R.id.login_password)
+
+        loginPhone.addTextChangedListener(object : TextWatcher {
+            private var current = ""
+            private val maxLength = 13 // 000-0000-0000
+
+            override fun afterTextChanged(s: Editable?) {
+                if (s.toString() != current) {
+                    var userInput = s.toString().replace(Regex("[^\\d]"), "")
+
+                    if (userInput.length > 11) {
+                        userInput = userInput.substring(0, 11)
+                    }
+
+                    when {
+                        userInput.length <= 3 -> current = userInput
+                        userInput.length <= 7 -> {
+                            current = String.format(
+                                "%s-%s", userInput.substring(0, 3),
+                                userInput.substring(3, userInput.length)
+                            )
+                        }
+                        else -> {
+                            current = String.format(
+                                "%s-%s-%s", userInput.substring(0, 3),
+                                userInput.substring(3, 7),
+                                userInput.substring(7, userInput.length)
+                            )
+                        }
+                    }
+
+                    if (current.length > maxLength) {
+                        current = current.substring(0, maxLength)
+                    }
+
+                    loginPhone.removeTextChangedListener(this)
+                    loginPhone.setText(current)
+                    loginPhone.setSelection(current.length)
+                    loginPhone.addTextChangedListener(this)
+                }
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
 
         loginButton.setOnClickListener {
             val phone = loginPhone.text.toString()
@@ -104,6 +157,29 @@ class LoginFragment : Fragment() {
                     val saved_data = JSONObject(result).getJSONObject("UserData").toString()
                     Log.e(TAG, "저장된 정보: $saved_data")
                     file.writeText(JSONObject(result).getJSONObject("UserData").toString())
+
+                    val loginFileName = "user_status.json"
+                    val loginFile = File(internalStorageDir, loginFileName)
+                    try {
+                        // 파일이 존재하는 경우, 해당 파일을 읽어와서 내용을 업데이트
+                        if (loginFile.exists()) {
+                            val content = loginFile.readText()
+                            val userData = JSONObject(content)
+                            Log.d("userData", "$userData")
+                            userData.put("login_state", true) // 로그인 상태를 true로 업데이트
+                            // 기타 필요한 업데이트 작업 수행 가능
+                            Log.d("userData", "$userData")
+
+                            // 업데이트된 내용을 파일에 다시 쓰기
+                            file.writeText(userData.toString())
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+
+                    val adapter = viewPager2.adapter as ViewPager2Adapter
+                    adapter.updateItemCount(4)
+//                    viewPager2.setCurrentItem(0)
 
                     parentFragmentManager.beginTransaction().apply{
                         replace(R.id.fragment3_container, MyPageFragment())
@@ -138,9 +214,6 @@ class LoginFragment : Fragment() {
 
             }
 
-
-
-
         }
 
 
@@ -171,6 +244,23 @@ class LoginFragment : Fragment() {
                                     val internalStorageDir = requireActivity().applicationContext.getFilesDir()
                                     val file = File(internalStorageDir, fileName)
                                     file.writeText(JSONObject(result).getJSONObject("UserData").toString())
+
+                                    val loginFileName = "user_status.json"
+                                    val loginFile = File(internalStorageDir, loginFileName)
+                                    try {
+                                        // 파일이 존재하는 경우, 해당 파일을 읽어와서 내용을 업데이트
+                                        if (loginFile.exists()) {
+                                            val content = file.readText()
+                                            val userData = JSONObject(content)
+                                            userData.put("login_state", true) // 로그인 상태를 true로 업데이트
+                                            // 기타 필요한 업데이트 작업 수행 가능
+
+                                            // 업데이트된 내용을 파일에 다시 쓰기
+                                            file.writeText(userData.toString())
+                                        }
+                                    } catch (e: Exception) {
+                                        e.printStackTrace()
+                                    }
 
                                     parentFragmentManager.beginTransaction().apply{
                                         replace(R.id.fragment3_container, MyPageFragment())
@@ -242,8 +332,6 @@ class LoginFragment : Fragment() {
                 commit()
             }
         }
-
-
 
 
 

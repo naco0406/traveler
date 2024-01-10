@@ -4,6 +4,8 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.content.ContentValues.TAG
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -35,6 +37,7 @@ import java.io.IOException
 
 class SignUpFragment : Fragment() {
     private val TAG = this.javaClass.simpleName
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -51,7 +54,50 @@ class SignUpFragment : Fragment() {
         val cancelButton = view.findViewById<Button>(R.id.dialogButtonCancel)
         val naverSignupButton = view.findViewById<NidOAuthLoginButton>(R.id.naverSignup)
 
+        signup_phoneNum.addTextChangedListener(object : TextWatcher {
+            private var current = ""
+            private val maxLength = 13 // 000-0000-0000
 
+            override fun afterTextChanged(s: Editable?) {
+                if (s.toString() != current) {
+                    var userInput = s.toString().replace(Regex("[^\\d]"), "")
+
+                    if (userInput.length > 11) {
+                        userInput = userInput.substring(0, 11)
+                    }
+
+                    when {
+                        userInput.length <= 3 -> current = userInput
+                        userInput.length <= 7 -> {
+                            current = String.format(
+                                "%s-%s", userInput.substring(0, 3),
+                                userInput.substring(3, userInput.length)
+                            )
+                        }
+                        else -> {
+                            current = String.format(
+                                "%s-%s-%s", userInput.substring(0, 3),
+                                userInput.substring(3, 7),
+                                userInput.substring(7, userInput.length)
+                            )
+                        }
+                    }
+
+                    if (current.length > maxLength) {
+                        current = current.substring(0, maxLength)
+                    }
+
+                    signup_phoneNum.removeTextChangedListener(this)
+                    signup_phoneNum.setText(current)
+                    signup_phoneNum.setSelection(current.length)
+                    signup_phoneNum.addTextChangedListener(this)
+                }
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
 
         // 확인 버튼 클릭 리스너
         okButton.setOnClickListener {

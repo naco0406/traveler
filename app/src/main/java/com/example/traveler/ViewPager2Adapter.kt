@@ -8,23 +8,20 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 
 class ViewPager2Adapter(fragmentActivity: FragmentActivity) : FragmentStateAdapter(fragmentActivity) {
 
+    private var itemCount = 3
 
-    private val fragmentList: MutableList<Fragment> = mutableListOf(SecondFragment(),FirstFragment(),ThirdFragment(),InputFragment())
-    private val itemCount = fragmentList.size
+
     override fun getItemCount(): Int {
         return itemCount
     }
+    fun updateItemCount(newCount: Int) {
+        itemCount = newCount
+        notifyDataSetChanged() // 아이템 개수 변경을 알림
 
-    fun getFragment(position: Int): Fragment {
-        return fragmentList[position]
     }
 
     override fun createFragment(position: Int): Fragment {
         // 해당 위치의 Fragment 반환
         return fragmentList[position]
-    }
-    fun addFragment(fragment: Fragment) {
-        fragmentList.add(fragment)
-        notifyDataSetChanged()
     }
 }

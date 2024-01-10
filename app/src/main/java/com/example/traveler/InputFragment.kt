@@ -1,10 +1,12 @@
 package com.example.traveler
 
+import OnPlaceUpdateListener
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -18,6 +20,7 @@ import com.example.traveler.MyTrip
 import com.example.traveler.Place
 import com.example.traveler.R
 import com.example.traveler.Trip
+import com.google.android.gms.common.api.ApiException
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.gson.Gson
@@ -32,11 +35,18 @@ import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
+import okhttp3.Call
+import okhttp3.Callback
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.Response
+import org.json.JSONArray
+import org.json.JSONObject
+import java.io.File
 import java.io.IOException
 import java.util.Date
 
@@ -69,7 +79,7 @@ class MyTripAdapter(private val mytrip: MyTrip) : RecyclerView.Adapter<MyTripAda
         val textView: TextView = view.findViewById(R.id.textView)
     }
 }
-class InputFragment : Fragment(), OnMapReadyCallback {
+class InputFragment : Fragment(), OnMapReadyCallback, OnPlaceUpdateListener {
     private lateinit var viewPager: ViewPager2
     private lateinit var tabs: TabLayout
     private var mytrip: MyTrip? = null
@@ -77,18 +87,53 @@ class InputFragment : Fragment(), OnMapReadyCallback {
     private lateinit var naverMap: NaverMap
     private lateinit var toolbar: Toolbar
     private lateinit var daysContainer: LinearLayout
+    private var currentTabPosition: Int = 0 // 현재 탭 위치를 저장하는 전역 변수
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        fetchMyTrips("010-5678-9012")
+//        fetchMyTrips("010-5678-9012")
 
-        val client = OkHttpClient()
-        val serverIp = getString(R.string.server_ip)
-        val url = "$serverIp/get_mytrips_all"
-        val request = Request.Builder()
-            .url(url)
-            .build()
+        if (isMyTripFileExists()) {
+            loadMyTripFromFile()
+            updateMarkersAndCamera()
+        } else {
+            openNewTripFragment() // 새 여행 경로를 생성하는 프래그먼트 열기
+        }
+
+    }
+    private fun isMyTripFileExists(): Boolean {
+        val fileName = "MyTrip.json"
+        val internalStorageDir = requireActivity().applicationContext.filesDir
+        val file = File(internalStorageDir, fileName)
+        return file.exists()
+    }
+
+    private fun loadMyTripFromFile() {
+        val fileName = "MyTrip.json"
+        val internalStorageDir = requireActivity().applicationContext.filesDir
+        val file = File(internalStorageDir, fileName)
+        try {
+            val content = file.readText()
+            val gson = Gson()
+            mytrip = gson.fromJson(content, MyTrip::class.java)
+            // UI 초기화
+            initializeUI()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            openNewTripFragment() // 파일 로드 실패 시 새 여행 경로 생성 프래그먼트 열기
+        }
+    }
+
+    private fun openNewTripFragment() {
+        // 새 여행 경로를 생성하는 프래그먼트로 전환
+        if (!isMyTripFileExists()) {
+            val newTripFragment = NewTripFragment()
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(R.id.InputContainer, newTripFragment)
+                .addToBackStack(null)
+                .commit()
+        }
     }
 
     override fun onCreateView(
@@ -134,9 +179,22 @@ class InputFragment : Fragment(), OnMapReadyCallback {
                 childFragmentManager.beginTransaction().add(R.id.map_view, it).commit()
             }
         mapFragment.getMapAsync(this)
+
+        // ViewPager2 및 TabLayout 찾기
+        viewPager = view.findViewById(R.id.viewPager)
+        tabs = view.findViewById(R.id.tabs)
+
+        // ViewPager2 설정
+        mytrip?.let { currentMyTrip ->
+            viewPager.adapter = MyTripViewPagerAdapter(requireActivity(), currentMyTrip)
+            TabLayoutMediator(tabs, viewPager) { tab, position ->
+                tab.text = "Day ${position + 1}"
+            }.attach()
+        }
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
+                currentTabPosition = position
                 updateMarkersForPosition(position)
             }
         })
@@ -148,18 +206,92 @@ class InputFragment : Fragment(), OnMapReadyCallback {
         }
 
         setupToolbar()
+        val saveMyTripButton = view.findViewById<Button>(R.id.saveMyTripButton)
+        saveMyTripButton.setOnClickListener {
+            uploadTripData()
+        }
     }
+
+    private fun uploadTripData() {
+        val loginfileName = "Mypage.json"
+        val internalStorageDir = requireActivity().applicationContext.getFilesDir()
+        val loginfile = File(internalStorageDir, loginfileName)
+        val logincontent = loginfile.readText()
+        val myData = JSONObject(logincontent)
+        val myphone = myData.getString("phone")
+
+        val fileName = "MyTrip.json"
+//        val internalStorageDir = requireActivity().applicationContext.getFilesDir()
+        val file = File(internalStorageDir, fileName)
+        if (file.exists()) {
+            val jsonContent = file.readText()
+            uploadDataToServer(jsonContent, myphone) { success ->
+                if (success) {
+                    file.delete() // 파일 삭제
+//                    Toast.makeText(context, "Trip data uploaded and local file deleted.", Toast.LENGTH_LONG).show()
+                } else {
+//                    Toast.makeText(context, "Failed to upload trip data.", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
+
+    private fun uploadDataToServer(jsonData: String, phone: String, callback: (Boolean) -> Unit) {
+        val client = OkHttpClient()
+        val json = JSONObject().apply {
+            put("phone", phone)
+            put("mytrip", JSONObject(jsonData))
+        }
+        val mediaType = "application/json; charset=utf-8".toMediaTypeOrNull()
+        val requestBody = json.toString().toRequestBody(mediaType)
+
+//        val requestBody = RequestBody.create("application/json; charset=utf-8".toMediaTypeOrNull(), jsonData)
+        val serverIp = getString(R.string.server_ip)
+        val url = "$serverIp/upload_mytrip_data"
+        val request = Request.Builder()
+            .url(url)
+            .post(requestBody)
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onResponse(call: Call, response: Response) {
+                if (response.isSuccessful) {
+                    callback(true)
+                } else {
+                    callback(false)
+                }
+            }
+
+            override fun onFailure(call: Call, e: IOException) {
+                callback(false)
+            }
+        })
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (isMyTripFileExists() && this::naverMap.isInitialized) {
+            loadMyTripFromFile()
+            updateMarkersAndCamera()
+        } else if (!isMyTripFileExists()) {
+            openNewTripFragment()
+        }
+    }
+
     private fun isMapInitialized(): Boolean {
         return this::naverMap.isInitialized
     }
 
     private fun updateMarkersForPosition(position: Int) {
         if (isMapInitialized()) {
-            mytrip?.let { currentMyTrip ->
-                if (position < currentMyTrip.places.size) {
-                    val dayActivities = currentMyTrip.places[position]
-                    clearMarkers() // 이전 마커들을 모두 제거
-                    addMarkersToMap(dayActivities) // 선택된 위치에 대한 마커들 추가
+            if(this::viewPager.isInitialized) {
+                mytrip?.let { currentMyTrip ->
+                    val selectedPosition = viewPager.currentItem
+                    if (selectedPosition < currentMyTrip.places.size) {
+                        val dayActivities = currentMyTrip.places[selectedPosition]
+                        clearMarkers()
+                        addMarkersToMap(dayActivities)
+                    }
                 }
             }
         }
@@ -190,9 +322,33 @@ class InputFragment : Fragment(), OnMapReadyCallback {
                     val mytripListType = object : TypeToken<List<MyTrip>>() {}.type
                     val mytrips = Gson().fromJson<List<MyTrip>>(responseBody, mytripListType)
 
+                    val fileName = "MyTrip.json"
+                    val internalStorageDir = requireActivity().applicationContext.getFilesDir()
+                    val file = File(internalStorageDir, fileName)
+
+                    val jsonArray = JSONArray(responseBody)
+                    val lastObjectIndex = jsonArray.length() - 1 // 배열의 마지막 인덱스
+                    val myTripObject = jsonArray.getJSONObject(lastObjectIndex) // 마지막 객체 추출
+                    file.writeText(myTripObject.toString())
+
+
+
                     if (mytrips.isNotEmpty()) {
                         activity?.runOnUiThread {
-                            mytrip = mytrips[0]
+                            val fileName = "MyTrip.json"
+                            val internalStorageDir = requireActivity().applicationContext.getFilesDir()
+                            val file = File(internalStorageDir, fileName)
+
+                            try {
+                                val content = file.readText()
+                                Log.e("Load JSON", "저장되어 있던 my data 불러오기: $content")
+                                val gson = Gson()
+                                val myData = JSONObject(content)
+                                mytrip = gson.fromJson(myData.toString(), MyTrip::class.java)
+                                Log.d("Load JSON", myData.getString("places").toString())
+                            } catch (e: ApiException) {
+                            }
+//                            mytrip = mytrips[0]
                             initializeUI()
                         }
                     }
@@ -232,8 +388,25 @@ class InputFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun setupToolbar() {
-        toolbar.title = "여행 일정" // Set toolbar title here
-        // If using ActionBarDrawerToggle or need to setup navigation click listener, do it here
+        if (isMyTripFileExists()) {
+            val fileName = "MyTrip.json"
+            val internalStorageDir = requireActivity().applicationContext.getFilesDir()
+            val file = File(internalStorageDir, fileName)
+            var city = ""
+
+            try {
+                val content = file.readText()
+                Log.e("Load JSON", "저장되어 있던 my data 불러오기: $content")
+                val gson = Gson()
+                val myData = JSONObject(content)
+                mytrip = gson.fromJson(myData.toString(), MyTrip::class.java)
+                city = myData.getString("city").toString()
+            } catch (e: ApiException) {
+            }
+            toolbar.title = "$city 여행 일정" // Set toolbar title here
+        } else {
+            toolbar.title = "여행 일정" // Set toolbar title here
+        }
     }
     override fun onMapReady(naverMap: NaverMap) {
         this.naverMap = naverMap
@@ -254,6 +427,11 @@ class InputFragment : Fragment(), OnMapReadyCallback {
             if (currentMyTrip.places.isNotEmpty()) {
                 addMarkersToMap(currentMyTrip.places[0])
             }
+        }
+
+        if (isMyTripFileExists()) {
+            loadMyTripFromFile()
+            updateMarkersAndCamera()
         }
 
     }
@@ -301,12 +479,15 @@ class InputFragment : Fragment(), OnMapReadyCallback {
         override fun createFragment(position: Int): Fragment {
             // 각 포지션에 맞는 TripDayFragment 생성
             val dayActivities = mytrip.places[position]
-            return MyTripDayFragment.newInstance(dayActivities, ::openSearchPlaceFragment)
+            val dayFragment = MyTripDayFragment.newInstance(dayActivities, position, ::openSearchPlaceFragment)
+            dayFragment.placeUpdateListener = this@InputFragment
+            return dayFragment
+//            return MyTripDayFragment.newInstance(dayActivities, ::openSearchPlaceFragment)
         }
     }
 
     private fun addMarkersToMap(places: List<Place>) {
-        if (places.isNotEmpty()) {
+        if (this::naverMap.isInitialized && places.isNotEmpty()) {
             val boundsBuilder = LatLngBounds.Builder()
             for ((index, place) in places.withIndex()) {
                 val latLng = LatLng(place.mapx.toDouble(), place.mapy.toDouble())
@@ -332,6 +513,33 @@ class InputFragment : Fragment(), OnMapReadyCallback {
             // 예: naverMap.moveCamera(CameraUpdate.scrollTo(DEFAULT_LAT_LNG))
         }
     }
+
+    override fun onPlaceUpdated() {
+        updateMarkersAndCamera()
+    }
+
+    private fun updateMarkersAndCamera() {
+        // viewPager가 초기화되었는지 확인
+        if (this::naverMap.isInitialized && this::viewPager.isInitialized) {
+//            val currentPosition = viewPager.currentItem
+
+            mytrip?.let { currentMyTrip ->
+                // 현재 선택된 탭의 위치에 따라 마커와 카메라 업데이트
+                val selectedPosition = viewPager.currentItem
+                if (selectedPosition < currentMyTrip.places.size) {
+                    val dayActivities = currentMyTrip.places[selectedPosition]
+                    clearMarkers()
+                    addMarkersToMap(dayActivities)
+                }
+            }
+            viewPager.currentItem = currentTabPosition
+
+        } else {
+            // viewPager가 초기화되지 않았다면 로그 기록 또는 오류 처리
+            Log.e("InputFragment", "ViewPager not initialized")
+        }
+    }
+
 
     private fun getCustomIconResource(number: Int): Int {
         // 이 메서드는 숫자에 따라 다른 이미지 리소스를 반환합니다.
